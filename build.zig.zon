@@ -1,0 +1,29 @@
+.{
+    .name = .pbnj,
+    .version = "0.0.1",
+    .fingerprint = 0x5731aea1123757c9,
+    .minimum_zig_version = "0.16.0",
+    .dependencies = .{
+        .stdx = .{
+            .url = "https://github.com/trevorswan11/stdx/archive/refs/tags/v2.4.0.tar.gz",
+            .hash = "stdx-2.4.0-dNitg6rgCACR6lf7WaOHaJG921eA2ySuPCj4l84kT4bK",
+        },
+        .sokol = .{
+            .url = "https://github.com/floooh/sokol/archive/6c283ecc698d583f1e8b6f85388c6b55b4bbe0cc.tar.gz",
+            .hash = "N-V-__8AAKOfaADmYKchxzwva_7bGvawPDwAXN79_Q6UYx-A",
+        },
+        .imgui = .{
+            .url = "https://github.com/ocornut/imgui/archive/refs/tags/v1.92.9b.tar.gz",
+            .hash = "N-V-__8AAPoXegDDrlBN-ExdeEp0KuI2CudplLDeaVyigil4",
+        },
+        .stb = .{
+            .url = "https://github.com/nothings/stb/archive/31c1ad37456438565541f4919958214b6e762fb4.tar.gz",
+            .hash = "N-V-__8AAN1DTgAKvlSQnjJwSg4ZY2JP5OHmzKOcA4BewA4Y",
+        },
+        .miniaudio = .{
+            .url = "https://github.com/mackron/miniaudio/archive/refs/tags/0.11.25.tar.gz",
+            .hash = "N-V-__8AAHNWwAASlNuYbrP1-3UqXdwbYvZ_6nIJhpAcRMfi",
+        },
+    },
+    .paths = .{""},
+}

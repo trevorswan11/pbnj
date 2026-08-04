@@ -11,4 +11,4 @@ TEST_CASE("Stub") {
     CHECK(UNWRAP(a) == 1);
 }
 
-} // namespace cairn::tests
+} // namespace pbnj::tests

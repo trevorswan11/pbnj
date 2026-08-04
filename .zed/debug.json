@@ -1,0 +1,100 @@
+// Project-local debug tasks
+//
+// For more documentation on how to configure debug tasks,
+// see: https://zed.dev/docs/debugger
+[
+    {
+        "adapter": "CodeLLDB",
+        "label": "pbnj (C++)",
+        "request": "launch",
+        "name": "pbnj",
+        "program": "zig-out/bin/pbnj",
+        "build": {
+            "command": "zig",
+            "args": [
+                "build"
+            ]
+        },
+        "stopOnEntry": false,
+    },
+    {
+        "adapter": "CodeLLDB",
+        "label": "test-audio (C++)",
+        "request": "launch",
+        "name": "test-exec",
+        "program": "zig-out/tests/audio",
+        "build": {
+            "command": "zig",
+            "args": [
+                "build",
+                "test-audio",
+                "-Dinstall-tests-only"
+            ]
+        },
+        "stopOnEntry": false
+    },
+    {
+        "adapter": "CodeLLDB",
+        "label": "test-network (C++)",
+        "request": "launch",
+        "name": "test-network",
+        "program": "zig-out/tests/network",
+        "build": {
+            "command": "zig",
+            "args": [
+                "build",
+                "test-network",
+                "-Dinstall-tests-only"
+            ]
+        },
+        "stopOnEntry": false
+    },
+    {
+        "adapter": "CodeLLDB",
+        "label": "test-services (C++)",
+        "request": "launch",
+        "name": "test-services",
+        "program": "zig-out/tests/services",
+        "build": {
+            "command": "zig",
+            "args": [
+                "build",
+                "test-services",
+                "-Dinstall-tests-only"
+            ]
+        },
+        "stopOnEntry": false
+    },
+    {
+        "adapter": "CodeLLDB",
+        "label": "test-support (C++)",
+        "request": "launch",
+        "name": "test-support",
+        "program": "zig-out/tests/support",
+        "build": {
+            "command": "zig",
+            "args": [
+                "build",
+                "test-support",
+                "-Dinstall-tests-only"
+            ]
+        },
+        "stopOnEntry": false
+    },
+    {
+        "adapter": "CodeLLDB",
+        "label": "test-ui (C++)",
+        "request": "launch",
+        "name": "test-ui",
+        "program": "zig-out/tests/ui",
+        "build": {
+            "command": "zig",
+            "args": [
+                "build",
+                "test-ui",
+                "-Dinstall-tests-only"
+            ]
+        },
+        "stopOnEntry": false
+    },
+]

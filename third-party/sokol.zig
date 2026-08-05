@@ -27,7 +27,7 @@ pub fn build(b: *std.Build, config: Dependency.Config) struct {
         \\#include <sokol_log.h>
     );
 
-    var sokol_flags: stdx.ArrayList([]const u8) = .fromSlice(b,  &.{
+    var sokol_flags: stdx.ArrayList([]const u8) = .fromSlice(b, &.{
         "-DSOKOL_APP_IMPL",
         "-DSOKOL_GFX_IMPL",
         "-DSOKOL_GLUE_IMPL",
@@ -49,13 +49,23 @@ pub fn build(b: *std.Build, config: Dependency.Config) struct {
         mod.linkFramework("CoreMedia", .{});
         mod.linkFramework("CoreVideo", .{});
     }
-    
+
     const is_windows = config.target.result.os.tag == .windows;
     if (is_windows) {
         sokol_flags.append("-DSOKOL_D3D11");
         mod.linkSystemLibrary("d3d11", .{});
         mod.linkSystemLibrary("dxgi", .{});
         mod.linkSystemLibrary("dwmapi", .{});
+    }
+
+    const is_linux = config.target.result.os.tag == .linux;
+    if (is_linux) {
+        sokol_flags.append("-DSOKOL_GLCORE");
+        mod.linkSystemLibrary("GL", .{});
+        mod.linkSystemLibrary("X11", .{});
+        mod.linkSystemLibrary("Xi", .{});
+        mod.linkSystemLibrary("Xcursor", .{});
+        mod.linkSystemLibrary("asound", .{});
     }
 
     const sokol_include = sokol_upstream.path(".");

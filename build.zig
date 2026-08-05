@@ -218,6 +218,7 @@ const Library = struct {
                 .link_libraries = link_libraries.wrapped.items,
             }),
         });
+        stdx.Dependency.addFrameworkSearchPaths(lib.root_module, config.target);
         lib.installHeadersDirectory(include_path, "", .{ .include_extensions = &.{".hh"} });
         if (config.cdb_steps) |cdb_steps| cdb_steps.append(&lib.step);
         if (config.auto_install) b.installArtifact(lib);
@@ -280,6 +281,7 @@ const Test = struct {
                 },
             },
         });
+        stdx.Dependency.addFrameworkSearchPaths(test_artifact.root_module, config.target);
         if (config.cdb_steps) |cdb| cdb.append(&test_artifact.step);
 
         return .{
@@ -403,6 +405,7 @@ fn addArtifacts(b: *std.Build, config: struct {
             },
         },
     });
+    stdx.Dependency.addFrameworkSearchPaths(pbnj.root_module, target);
     if (config.auto_install) b.installArtifact(pbnj);
     if (config.cdb_steps) |cdb_steps| cdb_steps.append(&pbnj.step);
 

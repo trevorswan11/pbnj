@@ -1,5 +1,5 @@
 {
-  description = "CairnDB development.";
+  description = "PBnJ development.";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";

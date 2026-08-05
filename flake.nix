@@ -42,14 +42,7 @@
           ++ (with llvmPackages_21; [
             clang-tools
             lldb
-          ])
-          ++ lib.optionals stdenv.isLinux [
-            libGL
-            libx11
-            libxi
-            libxcursor
-            alsa-lib
-          ];
+          ]);
 
           shellHook = ''
             # Without this, Zig freaks out over unknown flags

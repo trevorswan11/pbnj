@@ -36,6 +36,8 @@ pub fn build(b: *std.Build, config: Dependency.Config) struct {
         "-DSOKOL_NO_ENTRY",
     });
 
+    const is_linux = config.target.result.os.tag == .linux;
+    const is_windows = config.target.result.os.tag == .windows;
     const is_darwin = config.target.result.os.tag.isDarwin();
     Dependency.addFrameworkSearchPaths(mod, config.target);
     if (is_darwin) {
@@ -48,18 +50,15 @@ pub fn build(b: *std.Build, config: Dependency.Config) struct {
         mod.linkFramework("AVFoundation", .{});
         mod.linkFramework("CoreMedia", .{});
         mod.linkFramework("CoreVideo", .{});
-    }
-
-    const is_windows = config.target.result.os.tag == .windows;
-    if (is_windows) {
+    } else if (is_windows) {
         sokol_flags.append("-DSOKOL_D3D11");
         mod.linkSystemLibrary("d3d11", .{});
         mod.linkSystemLibrary("dxgi", .{});
-        mod.linkSystemLibrary("dwmapi", .{});
-    }
-
-    const is_linux = config.target.result.os.tag == .linux;
-    if (is_linux) {
+        mod.linkSystemLibrary("kernel32", .{});
+        mod.linkSystemLibrary("user32", .{});
+        mod.linkSystemLibrary("gdi32", .{});
+        mod.linkSystemLibrary("ole32", .{});
+    } else if (is_linux) {
         sokol_flags.append("-DSOKOL_GLCORE");
         mod.linkSystemLibrary("GL", .{});
         mod.linkSystemLibrary("X11", .{});
@@ -69,13 +68,14 @@ pub fn build(b: *std.Build, config: Dependency.Config) struct {
     }
 
     const sokol_include = sokol_upstream.path(".");
+    const sokol_util = sokol_upstream.path("util");
     mod.addIncludePath(sokol_include);
     mod.addCSourceFile(.{
         .file = file.getDirectory().path(b, "sokol.cpp"),
         .flags = sokol_flags.wrapped.items,
         .language = if (is_darwin) .objective_cpp else null,
     });
-    mod.addIncludePath(sokol_upstream.path("util"));
+    mod.addIncludePath(sokol_util);
 
     const imgui_root = imgui_upstream.path(".");
     const imgui_misc_cpp = imgui_upstream.path("misc/cpp");
@@ -101,6 +101,8 @@ pub fn build(b: *std.Build, config: Dependency.Config) struct {
     lib.installHeadersDirectory(imgui_root, "", .{});
     lib.installHeadersDirectory(sokol_include, "", .{});
     lib.installHeadersDirectory(imgui_misc_cpp, "", .{});
+    lib.installHeadersDirectory(sokol_util, "", .{});
+
     return .{
         .imgui_upstream = imgui_upstream,
         .sokol_upstream = sokol_upstream,

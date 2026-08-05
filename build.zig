@@ -391,6 +391,7 @@ fn addArtifacts(b: *std.Build, config: struct {
 
     var exe_link_libraries: stdx.ArrayList(*std.Build.Step.Compile) = .fromSlice(b, &all_pbnj_libraries);
     exe_link_libraries.append(config.stdx_dep.artifact("stdx"));
+    exe_link_libraries.append(sokol_dep.artifact);
 
     const pbnj = stdx.utils.createExecutable(b, .{
         .target = target,
@@ -412,6 +413,11 @@ fn addArtifacts(b: *std.Build, config: struct {
     stdx.Dependency.addFrameworkSearchPaths(pbnj.root_module, target);
     if (config.auto_install) b.installArtifact(pbnj);
     if (config.cdb_steps) |cdb_steps| cdb_steps.append(&pbnj.step);
+
+    const disable_console = config.optimize != .Debug;
+    if (target.result.os.tag == .windows and disable_console) {
+        pbnj.subsystem = .windows;
+    }
 
     var tests: ?Tests = null;
     if (config.target == null) {

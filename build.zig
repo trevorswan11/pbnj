@@ -57,11 +57,6 @@ pub fn build(b: *std.Build) !void {
         .cppcheck = stdx_dep.artifact("cppcheck"),
     });
 
-    try addPackageStep(b, .{
-        .cxx_flags = package_flags.wrapped.items,
-        .compressor = stdx_dep.artifact("compressor"),
-    });
-
     if (stdx.KcovBuilder.allowedTarget(b.graph.host)) {
         if (artifacts.tests) |tests| {
             var include_patterns: stdx.ArrayList([]const u8) = .init(b);
@@ -481,7 +476,7 @@ fn addArtifacts(b: *std.Build, config: struct {
     };
 }
 
-const counted_extensions = [_][]const u8{ ".cc", ".hh", ".inc", ".zig" };
+const counted_extensions = [_][]const u8{ ".cc", ".hh", ".zig" };
 
 fn addToolingSteps(b: *std.Build, config: struct {
     cdb_gen: *stdx.CDBGenerator,
@@ -512,50 +507,4 @@ fn addToolingSteps(b: *std.Build, config: struct {
     counted_files.appendSlice(tooling_paths.cxx);
     counted_files.appendSlice(tooling_paths.zig);
     _ = stdx.LOCCounter.init(b, counted_files.wrapped.items);
-}
-
-fn addPackageStep(b: *std.Build, config: struct {
-    cxx_flags: []const []const u8,
-    compressor: *std.Build.Step.Compile,
-}) !void {
-    const packager: *stdx.Packager = .init(b, .{
-        .compressor = config.compressor,
-    });
-
-    for (stdx.Packager.base_target_queries) |query| {
-        const target = b.resolveTargetQuery(query);
-        const stdx_dep = b.dependency("stdx", .{
-            .target = target,
-            .optimize = .ReleaseFast,
-            .building_for_dep = true,
-            .run_cdb_gen = false,
-            .packaging = true,
-        });
-
-        const artifacts = try addArtifacts(b, .{
-            .target = target,
-            .optimize = .ReleaseFast,
-            .cxx_flags = config.cxx_flags,
-            .cdb_steps = null,
-            .exe_override_behavior = .standalone,
-            .auto_install = false,
-            .packaging = true,
-            .stdx_dep = stdx_dep,
-        });
-
-        stdx.Packager.configureExe(b, target, version_str, artifacts.pbnj);
-
-        const package_artifact_dirname = b.fmt("pbnj-{s}-{s}", .{ try query.zigTriple(b.allocator), version_str });
-        const copy_paths = [_]stdx.Packager.CopyPath{
-            .{ .source = artifacts.pbnj.getEmittedBin(), .destination = b.fmt("bin/{s}", .{artifacts.pbnj.out_filename}) },
-            .{ .source = b.path("LICENSE"), .destination = "LICENSE" },
-            .{ .source = b.path("README.md"), .destination = "README.md" },
-        };
-
-        packager.addArchives(.{
-            .target = target,
-            .copy_paths = &copy_paths,
-            .output_dir_basename = package_artifact_dirname,
-        });
-    }
 }

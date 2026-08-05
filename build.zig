@@ -2,9 +2,9 @@ const std = @import("std");
 const zon = @import("build.zig.zon");
 pub const stdx = @import("stdx");
 
-const CDBGenerator = stdx.CDBGenerator;
-const LOCCounter = stdx.LOCCounter;
-const RemoveDir = stdx.RemoveDir;
+const stb = @import("third-party/stb.zig");
+const sokol = @import("third-party/sokol.zig");
+const miniaudio = @import("third-party/miniaudio.zig");
 
 pub fn build(b: *std.Build) !void {
     const optimize = b.standardOptimizeOption(.{
@@ -40,7 +40,7 @@ pub fn build(b: *std.Build) !void {
         "Install tests without running them (default: false)",
     ) orelse false;
 
-    const cdb_gen: *CDBGenerator = .init(b);
+    const cdb_gen: *stdx.CDBGenerator = .init(b);
     var cdb_steps: stdx.ArrayList(*std.Build.Step) = .init(b);
     const artifacts = try addArtifacts(b, .{
         .optimize = optimize,
@@ -347,6 +347,14 @@ fn addArtifacts(b: *std.Build, config: struct {
         .PBNJ_APPLE = target.result.os.tag == .macos,
     });
 
+    const dep_config: stdx.Dependency.Config = .{
+        .optimize = config.optimize,
+        .target = target,
+    };
+    const stb_dep = stb.build(b, dep_config);
+    const sokol_dep = sokol.build(b, dep_config);
+    const ma_dep = miniaudio.build(b, dep_config);
+
     var base_lib_config: ArtifactConfig = .{
         .name = undefined,
         .target = target,
@@ -358,13 +366,17 @@ fn addArtifacts(b: *std.Build, config: struct {
         .auto_install = config.auto_install,
         .profile = config.profile,
     };
-    const libsupport: Library = .init(b, base_lib_config.with("support", .{}));
+    const libsupport: Library = .init(b, base_lib_config.with("support", .{
+        .link_libraries = &.{ stb_dep.artifact, ma_dep.artifact },
+    }));
     base_lib_config.libsupport = libsupport.artifact;
 
     const libaudio: Library = .init(b, base_lib_config.with("audio", .{}));
     const libnetwork: Library = .init(b, base_lib_config.with("network", .{}));
     const libservices: Library = .init(b, base_lib_config.with("services", .{}));
-    const libui: Library = .init(b, base_lib_config.with("ui", .{}));
+    const libui: Library = .init(b, base_lib_config.with("ui", .{
+        .link_libraries = &.{sokol_dep.artifact},
+    }));
 
     const all_pbnj_libraries = [_]*std.Build.Step.Compile{
         libsupport.artifact,  libaudio.artifact, libnetwork.artifact,
@@ -459,7 +471,7 @@ fn addArtifacts(b: *std.Build, config: struct {
 const counted_extensions = [_][]const u8{ ".cc", ".hh", ".inc", ".zig" };
 
 fn addToolingSteps(b: *std.Build, config: struct {
-    cdb_gen: *CDBGenerator,
+    cdb_gen: *stdx.CDBGenerator,
     cppcheck: *std.Build.Step.Compile,
 }) !void {
     const tooling_paths: stdx.steps.FmtPaths = .{
@@ -486,7 +498,7 @@ fn addToolingSteps(b: *std.Build, config: struct {
     var counted_files: stdx.ArrayList([]const u8) = .init(b);
     counted_files.appendSlice(tooling_paths.cxx);
     counted_files.appendSlice(tooling_paths.zig);
-    _ = LOCCounter.init(b, counted_files.wrapped.items);
+    _ = stdx.LOCCounter.init(b, counted_files.wrapped.items);
 }
 
 fn addPackageStep(b: *std.Build, config: struct {

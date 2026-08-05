@@ -25,5 +25,14 @@
             .hash = "N-V-__8AAHNWwAASlNuYbrP1-3UqXdwbYvZ_6nIJhpAcRMfi",
         },
     },
-    .paths = .{""},
+    .paths = .{
+        "pbnj",
+        "lib",
+        "build.zig",
+        "build.zig.zon",
+        "flake.lock",
+        "flake.nix",
+        "LICENSE",
+        "README.md",
+    },
 }

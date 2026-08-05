@@ -5,7 +5,7 @@ const Dependency = stdx.Dependency;
 
 pub fn build(b: *std.Build, config: Dependency.Config) Dependency {
     const upstream = b.dependency("stb", .{});
-    const mod = b.addModule("stb", .{
+    const mod = b.createModule(.{
         .optimize = config.optimize,
         .target = config.target,
         .link_libc = true,

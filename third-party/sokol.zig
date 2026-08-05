@@ -10,7 +10,7 @@ pub fn build(b: *std.Build, config: Dependency.Config) struct {
 } {
     const imgui_upstream = b.dependency("imgui", .{});
     const sokol_upstream = b.dependency("sokol", .{});
-    const mod = b.addModule("sokol", .{
+    const mod = b.createModule(.{
         .optimize = config.optimize,
         .target = config.target,
         .link_libc = true,

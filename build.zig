@@ -83,7 +83,7 @@ pub fn build(b: *std.Build) !void {
             }
 
             try stdx.steps.addCoverage(b, .{
-                .curl = stdx_dep.artifact("curl"),
+                .curl = stdx_dep.artifact("execurl"),
                 .kcov = stdx_dep.artifact("kcov"),
                 .run_configs = configs.wrapped.items,
             });
@@ -368,6 +368,8 @@ fn addArtifacts(b: *std.Build, config: struct {
         .auto_install = config.auto_install,
         .profile = config.profile,
     };
+
+    const libcurl = config.stdx_dep.artifact("curl");
     const libsupport: Library = .init(b, base_lib_config.with("support", .{
         .link_libraries = &.{ stb_dep.artifact, ma_dep.artifact },
     }));
@@ -375,7 +377,9 @@ fn addArtifacts(b: *std.Build, config: struct {
 
     const libaudio: Library = .init(b, base_lib_config.with("audio", .{}));
     const libnetwork: Library = .init(b, base_lib_config.with("network", .{}));
-    const libservices: Library = .init(b, base_lib_config.with("services", .{}));
+    const libservices: Library = .init(b, base_lib_config.with("services", .{
+        .link_libraries = &.{libcurl},
+    }));
     const libui: Library = .init(b, base_lib_config.with("ui", .{
         .link_libraries = &.{sokol_dep.artifact},
     }));

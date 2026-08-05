@@ -5,7 +5,7 @@ const Dependency = stdx.Dependency;
 
 pub fn build(b: *std.Build, config: Dependency.Config) Dependency {
     const upstream = b.dependency("miniaudio", .{});
-    const mod = b.addModule("miniaudio", .{
+    const mod = b.createModule(.{
         .optimize = config.optimize,
         .target = config.target,
         .link_libc = true,

@@ -14,10 +14,12 @@
 #include "sokol_imgui.h"
 #include "sokol_log.h"
 
+#include "ui/core/frame.hh"
+
+using namespace pbnj;
+
 static bool show_test_window    = true;
 static bool show_another_window = false;
-
-static sg_pass_action pass_action;
 
 static void init(void) {
     // setup sokol-gfx, sokol-time and sokol-imgui
@@ -31,17 +33,10 @@ static void init(void) {
     simgui_desc_t simgui_desc = {};
     simgui_desc.logger.func   = slog_func;
     simgui_setup(&simgui_desc);
-
-    // initial clear color
-    pass_action.colors[0].load_action = SG_LOADACTION_CLEAR;
-    pass_action.colors[0].clear_value = {0.0f, 0.5f, 0.7f, 1.0f};
 }
 
 static void frame(void) {
-    const int    width  = sapp_width();
-    const int    height = sapp_height();
-    const double dt     = sapp_frame_duration();
-    simgui_new_frame({width, height, dt, sapp_dpi_scale()});
+    const ui::frame frame;
 
     // 1. Show a simple window
     // Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets appears in a window
@@ -49,7 +44,6 @@ static void frame(void) {
     static float f = 0.0f;
     ImGui::Text("Hello, world!");
     ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
-    ImGui::ColorEdit3("clear color", &pass_action.colors[0].clear_value.r);
     if (ImGui::Button("Test Window")) { show_test_window ^= 1; }
     if (ImGui::Button("Another Window")) { show_another_window ^= 1; }
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
@@ -75,15 +69,6 @@ static void frame(void) {
         ImGui::SetNextWindowPos(ImVec2(460, 20), ImGuiCond_FirstUseEver);
         ImGui::ShowDemoWindow();
     }
-
-    // the sokol_gfx draw pass
-    sg_pass pass   = {};
-    pass.action    = pass_action;
-    pass.swapchain = sglue_swapchain();
-    sg_begin_pass(&pass);
-    simgui_render();
-    sg_end_pass();
-    sg_commit();
 }
 
 static void cleanup(void) {

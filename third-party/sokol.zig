@@ -17,7 +17,7 @@ pub fn build(b: *std.Build, config: Dependency.Config) struct {
         .link_libcpp = true,
     });
 
-    const file = b.addWriteFile("sokol.cpp",
+    const source = b.addWriteFile("sokol.cpp",
         \\#include <imgui.h>
         \\
         \\#include <sokol_app.h>
@@ -71,7 +71,7 @@ pub fn build(b: *std.Build, config: Dependency.Config) struct {
     const sokol_util = sokol_upstream.path("util");
     mod.addIncludePath(sokol_include);
     mod.addCSourceFile(.{
-        .file = file.getDirectory().path(b, "sokol.cpp"),
+        .file = source.getDirectory().path(b, "sokol.cpp"),
         .flags = sokol_flags.wrapped.items,
         .language = if (is_darwin) .objective_cpp else null,
     });
@@ -94,6 +94,22 @@ pub fn build(b: *std.Build, config: Dependency.Config) struct {
     mod.addIncludePath(imgui_upstream.path("backends"));
     mod.addIncludePath(imgui_misc_cpp);
 
+    const wrapper_headers = b.addWriteFile("sokol.h",
+        \\#pragma once
+        \\
+        \\// IWYU pragma: begin_exports
+        \\
+        \\#include <imgui.h>
+        \\
+        \\#include <sokol_app.h>
+        \\#include <sokol_gfx.h>
+        \\#include <sokol_glue.h>
+        \\#include <sokol_imgui.h>
+        \\#include <sokol_log.h>
+        \\
+        \\// IWYU pragma: end_exports
+    );
+
     const lib = b.addLibrary(.{
         .name = "sokol",
         .root_module = mod,
@@ -102,6 +118,7 @@ pub fn build(b: *std.Build, config: Dependency.Config) struct {
     lib.installHeadersDirectory(sokol_include, "", .{});
     lib.installHeadersDirectory(imgui_misc_cpp, "", .{});
     lib.installHeadersDirectory(sokol_util, "", .{});
+    lib.installHeadersDirectory(wrapper_headers.getDirectory(), "", .{});
 
     return .{
         .imgui_upstream = imgui_upstream,

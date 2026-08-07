@@ -376,7 +376,7 @@ fn addArtifacts(b: *std.Build, config: struct {
         .link_libraries = &.{libcurl},
     }));
     const libui: Library = .init(b, base_lib_config.with("ui", .{
-        .link_libraries = &.{sokol_dep.artifact},
+        .link_libraries = &.{ sokol_dep.artifact, stb_dep.artifact },
     }));
 
     const all_pbnj_libraries = [_]*std.Build.Step.Compile{

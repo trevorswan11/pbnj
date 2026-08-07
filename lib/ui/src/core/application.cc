@@ -2,8 +2,11 @@
 
 #include <gsl/pointers>
 #include <sokol.h>
+#include <stb_image.h>
 #include <stdx/profiler.hh>
+#include <stdx/types.hh>
 
+#include "ui/assets/app_icon.hh"
 #include "ui/core/frame.hh"
 
 namespace pbnj::ui {
@@ -30,9 +33,24 @@ auto application::launch() noexcept -> void {
     desc.user_data                   = this;
     desc.window_title                = "PBnJ";
     desc.ios.keyboard_resizes_canvas = false;
-    desc.icon.sokol_default          = true;
+    desc.icon.sokol_default          = false;
     desc.enable_clipboard            = true;
     desc.logger.func                 = slog_func;
+
+    // Custom image loaded for app icon
+    i32   width, height, comp;
+    auto* pixels               = stbi_load_from_memory(assets::APP_ICON_PNG.data(),
+                                         static_cast<i32>(assets::APP_ICON_PNG.size()),
+                                         &width,
+                                         &height,
+                                         &comp,
+                                         4);
+    desc.icon.images[0].width  = width;
+    desc.icon.images[0].height = height;
+    desc.icon.images[0].pixels = {
+        .ptr  = pixels,
+        .size = static_cast<usize>(width * height * 4),
+    };
 
     sapp_run(desc);
 }

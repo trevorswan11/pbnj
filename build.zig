@@ -386,7 +386,6 @@ fn addArtifacts(b: *std.Build, config: struct {
 
     var exe_link_libraries: stdx.ArrayList(*std.Build.Step.Compile) = .fromSlice(b, &all_pbnj_libraries);
     exe_link_libraries.append(config.stdx_dep.artifact("stdx"));
-    exe_link_libraries.append(sokol_dep.artifact);
 
     const pbnj = stdx.utils.createExecutable(b, .{
         .target = target,

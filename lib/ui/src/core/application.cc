@@ -39,8 +39,8 @@ auto application::launch() noexcept -> void {
 
     // Custom image loaded for app icon
     i32   width, height, comp;
-    auto* pixels               = stbi_load_from_memory(assets::APP_ICON_PNG.data(),
-                                         static_cast<i32>(assets::APP_ICON_PNG.size()),
+    auto* pixels               = stbi_load_from_memory(assets::app_icon.data(),
+                                         static_cast<i32>(assets::app_icon.size()),
                                          &width,
                                          &height,
                                          &comp,
@@ -66,6 +66,7 @@ auto application::on_init() noexcept -> void {
     simgui_desc.logger.func   = slog_func;
     simgui_setup(&simgui_desc);
 
+    fonts_.init(sapp_dpi_scale());
     styles_.apply_dark_mode();
 }
 

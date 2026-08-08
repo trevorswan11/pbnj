@@ -3,6 +3,7 @@
 #include <stdx/types.hh>
 #include <stdx/utility.hh>
 
+#include "ui/theme/fonts.hh"
 #include "ui/theme/style.hh"
 
 struct sapp_event;
@@ -29,6 +30,7 @@ class application {
     bool show_another_window_{false};
 
     theme::style_manager styles_;
+    theme::font_manager  fonts_;
 };
 
 } // namespace pbnj::ui

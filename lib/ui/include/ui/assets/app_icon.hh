@@ -4,7 +4,7 @@
 
 namespace pbnj::ui::assets {
 
-constexpr auto APP_ICON_PNG = std::to_array<unsigned char>({
+constexpr auto app_icon = std::to_array<unsigned char>({
 #include "ui/assets/raw/app_icon.inc"
 });
 

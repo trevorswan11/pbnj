@@ -66,8 +66,10 @@ auto application::on_init() noexcept -> void {
     simgui_desc.logger.func   = slog_func;
     simgui_setup(&simgui_desc);
 
-    fonts_.init(sapp_dpi_scale());
-    styles_.apply_dark_mode();
+    ctx_.fonts.init(sapp_dpi_scale());
+    ctx_.log.info("Initialized font manager");
+    ctx_.styles.apply_dark_mode();
+    ctx_.log.info("Applied application-wide dark mode");
 }
 
 auto application::on_frame() noexcept -> void {

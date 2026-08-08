@@ -3,6 +3,8 @@
 #include <stdx/types.hh>
 #include <stdx/utility.hh>
 
+#include "ui/theme/style.hh"
+
 struct sapp_event;
 
 namespace pbnj::ui {
@@ -25,6 +27,8 @@ class application {
     f32  slider_;
     bool show_test_window_{true};
     bool show_another_window_{false};
+
+    theme::style_manager styles_;
 };
 
 } // namespace pbnj::ui

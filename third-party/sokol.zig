@@ -58,6 +58,7 @@ pub fn build(b: *std.Build, config: Dependency.Config) struct {
         mod.linkSystemLibrary("user32", .{});
         mod.linkSystemLibrary("gdi32", .{});
         mod.linkSystemLibrary("ole32", .{});
+        mod.linkSystemLibrary("dwmapi", .{});
     } else if (is_linux) {
         sokol_flags.append("-DSOKOL_GLCORE");
         mod.linkSystemLibrary("GL", .{});

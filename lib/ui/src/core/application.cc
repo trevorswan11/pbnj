@@ -65,6 +65,8 @@ auto application::on_init() noexcept -> void {
     simgui_desc_t simgui_desc = {};
     simgui_desc.logger.func   = slog_func;
     simgui_setup(&simgui_desc);
+
+    styles_.apply_dark_mode();
 }
 
 auto application::on_frame() noexcept -> void {

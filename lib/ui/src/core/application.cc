@@ -13,7 +13,7 @@ namespace pbnj::ui {
 
 auto application::launch() noexcept -> void {
     PROFILE_FUNCTION();
-    sapp_desc desc        = {};
+    sapp_desc desc{};
     desc.init_userdata_cb = [](void* data) noexcept -> void {
         gsl::not_null app = static_cast<application*>(data);
         app->on_init();
@@ -57,13 +57,13 @@ auto application::launch() noexcept -> void {
 
 auto application::on_init() noexcept -> void {
     PROFILE_FUNCTION();
-    sg_desc desc     = {};
+    sg_desc desc{};
     desc.environment = sglue_environment();
     desc.logger.func = slog_func;
     sg_setup(&desc);
 
-    simgui_desc_t simgui_desc = {};
-    simgui_desc.logger.func   = slog_func;
+    simgui_desc_t simgui_desc{};
+    simgui_desc.logger.func = slog_func;
     simgui_setup(&simgui_desc);
 
     ctx_.fonts.init(sapp_dpi_scale());

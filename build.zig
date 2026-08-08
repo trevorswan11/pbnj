@@ -198,13 +198,17 @@ const Library = struct {
         include_paths.appendSlice(&.{ include_path, b.path(src) });
         config.tryAddSupport(&include_paths, &link_libraries);
 
+        var system_include_paths: stdx.ArrayList(std.Build.LazyPath) = .init(b);
+        const glm = b.dependency("glm", .{});
+        system_include_paths.append(glm.path("."));
+
         const lib = b.addLibrary(.{
             .name = config.name,
             .root_module = stdx.utils.createModule(b, .{
                 .target = config.target,
                 .optimize = config.optimize,
                 .include_paths = include_paths.wrapped.items,
-                .system_include_paths = config.system_include_paths,
+                .system_include_paths = system_include_paths.wrapped.items,
                 .cxx = .{
                     .files = src_paths,
                     .flags = config.cxx_flags,
@@ -251,6 +255,10 @@ const Test = struct {
         config.tryAddSupport(&include_paths, &link_libraries);
         config.tryAddTestHelpers(&include_paths, &link_libraries);
 
+        var system_include_paths: stdx.ArrayList(std.Build.LazyPath) = .init(b);
+        const glm = b.dependency("glm", .{});
+        system_include_paths.append(glm.path("."));
+
         const step_name = b.fmt("test-{s}", .{config.name});
         const desc = b.fmt("Build/run {s} tests", .{config.name});
 
@@ -262,6 +270,7 @@ const Test = struct {
             .cxx_flags = config.cxx_flags,
             .profile = config.profile,
             .include_paths = include_paths.wrapped.items,
+            .system_include_paths = system_include_paths.wrapped.items,
             .link_libraries = link_libraries.wrapped.items,
             .config_headers = &.{config.config_h},
             .executable_config = .{

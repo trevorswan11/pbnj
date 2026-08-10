@@ -15,6 +15,8 @@ class frame {
     ~frame();
     MAKE_PINNED(frame);
 
+    MAKE_GETTER(dt, f64)
+
   private:
     i32       width_;
     i32       height_;

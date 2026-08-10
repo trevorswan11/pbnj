@@ -76,6 +76,13 @@ auto application::on_frame() noexcept -> void {
     PROFILE_FUNCTION();
     const ui::frame frame;
 
+    const auto dt = frame.get_dt();
+    ctx_.router.update_current(ctx_, dt);
+
+    root_.render(ctx_);
+
+    // TODO: Remove rest of function below this line
+
     // 1. Show a simple window
     ImGui::Text("Hello, world!");
     ImGui::SliderFloat("float", &slider_, 0.0f, 1.0f);

@@ -3,6 +3,7 @@
 #include <stdx/types.hh>
 #include <stdx/utility.hh>
 
+#include "ui/components/root.hh"
 #include "ui/core/context.hh"
 
 struct sapp_event;
@@ -28,7 +29,8 @@ class application {
     bool show_test_window_{true};
     bool show_another_window_{false};
 
-    context ctx_;
+    context          ctx_;
+    components::root root_;
 };
 
 } // namespace pbnj::ui

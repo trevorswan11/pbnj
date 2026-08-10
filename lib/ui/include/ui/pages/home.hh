@@ -5,7 +5,7 @@
 namespace pbnj::ui::pages {
 
 class home : public page {
-    public:
+  public:
     auto on_mount(context& ctx) -> void override;
     auto on_unmount(context& ctx) -> void override;
     auto render(context& ctx) -> void override;

@@ -4,9 +4,9 @@
 #include <string>
 #include <utility>
 
+#include <stdx/function.hh>
 #include <stdx/types.hh>
 
-#include "support/thunk.hh"
 #include "ui/core/component.hh"
 
 namespace pbnj::ui::components {
@@ -21,10 +21,10 @@ struct track_row_props {
     bool                 is_active{false};
     bool                 is_playing{false};
 
-    thunk<void()> on_play;
-    thunk<void()> on_queue;
-    thunk<void()> on_open_artist;
-    thunk<void()> on_open_album;
+    stdx::function<void()> on_play;
+    stdx::function<void()> on_queue;
+    stdx::function<void()> on_open_artist;
+    stdx::function<void()> on_open_album;
 };
 
 class track_row : public component, private track_row_props {

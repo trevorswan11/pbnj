@@ -83,37 +83,6 @@ auto application::on_frame() noexcept -> void {
     ctx_.router.update_current(ctx_, dt);
 
     root_.render(ctx_);
-
-    // TODO: Remove rest of function below this line
-
-    // 1. Show a simple window
-    ImGui::Text("Hello, world!");
-    ImGui::SliderFloat("float", &slider_, 0.0f, 1.0f);
-    if (ImGui::Button("Test Window")) { show_test_window_ ^= true; }
-    if (ImGui::Button("Another Window")) { show_another_window_ ^= true; }
-    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
-                1000.0f / ImGui::GetIO().Framerate,
-                ImGui::GetIO().Framerate);
-    ImGui::Text("w: %d, h: %d, dpi_scale: %.1f", sapp_width(), sapp_height(), sapp_dpi_scale());
-    if (ImGui::Button(sapp_is_fullscreen() ? "Switch to windowed" : "Switch to fullscreen")) {
-        sapp_toggle_fullscreen();
-    }
-    ImGui::Text("sapp_frame_duration: %.6f", sapp_frame_duration());
-    ImGui::Text("sapp_frame_duration_unfiltered: %.6f", sapp_frame_duration_unfiltered());
-
-    // 2. Show another simple window, this time using an explicit Begin/End pair
-    if (show_another_window_) {
-        ImGui::SetNextWindowSize(ImVec2(200, 100), ImGuiCond_FirstUseEver);
-        ImGui::Begin("Another Window", &show_another_window_);
-        ImGui::Text("Hello");
-        ImGui::End();
-    }
-
-    // 3. Show the ImGui test window. Most of the sample code is in ImGui::ShowDemoWindow()
-    if (show_test_window_) {
-        ImGui::SetNextWindowPos(ImVec2(460, 20), ImGuiCond_FirstUseEver);
-        ImGui::ShowDemoWindow();
-    }
 }
 
 auto application::on_event(const sapp_event* event) noexcept -> void {

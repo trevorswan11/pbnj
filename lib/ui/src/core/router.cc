@@ -23,7 +23,7 @@ auto router::go_forward(context& ctx) -> bool {
     return true;
 }
 
-auto router::render_current(context& ctx) -> void { 
+auto router::render_current(context& ctx) -> void {
     if (!history_.empty() && history_idx_ < history_.size()) {
         history_[history_idx_]->render(ctx);
     }

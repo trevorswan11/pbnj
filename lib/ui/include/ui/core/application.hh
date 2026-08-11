@@ -25,10 +25,6 @@ class application {
     auto on_cleanup() noexcept -> void;
 
   private:
-    f32  slider_;
-    bool show_test_window_{true};
-    bool show_another_window_{false};
-
     context          ctx_;
     components::root root_;
 };

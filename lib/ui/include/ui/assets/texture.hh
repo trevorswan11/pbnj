@@ -34,7 +34,7 @@ template <> struct stdx::nullable<ImTextureID> {
     }
 };
 
-namespace pbnj::assets {
+namespace pbnj::ui::assets {
 
 struct texture {
     texture() = default;
@@ -52,4 +52,4 @@ struct texture {
     stdx::option<ImTextureID> imgui_id;
 };
 
-} // namespace pbnj::assets
+} // namespace pbnj::ui::assets

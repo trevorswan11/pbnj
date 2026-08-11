@@ -20,7 +20,7 @@ struct context {
     logger               log;
 
     core::router          router;
-    assets::texture_cache textures_;
+    assets::texture_cache textures;
 };
 
 } // namespace pbnj::ui

@@ -13,7 +13,7 @@
 #include "support/error.hh"
 #include "ui/assets/texture.hh"
 
-namespace pbnj::assets {
+namespace pbnj::ui::assets {
 
 class texture_cache {
   public:
@@ -26,11 +26,11 @@ class texture_cache {
     ~texture_cache() = default;
     MAKE_MOVE_ONLY(texture_cache);
 
-    [[nodiscard]] auto get_or_load_svg(std::string_view name, gsl::span<char> data)
+    [[nodiscard]] auto get_or_load_svg(std::string_view name, gsl::span<const char> data)
         -> result<ImTextureID>;
 
   private:
     string_map_t<texture> svg_cache_;
 };
 
-} // namespace pbnj::assets
+} // namespace pbnj::ui::assets

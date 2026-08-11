@@ -15,9 +15,9 @@
 #include "support/error.hh"
 #include "ui/assets/texture.hh"
 
-namespace pbnj::assets {
+namespace pbnj::ui::assets {
 
-auto texture_cache::get_or_load_svg(std::string_view name, gsl::span<char> data)
+auto texture_cache::get_or_load_svg(std::string_view name, gsl::span<const char> data)
     -> result<ImTextureID> {
     auto it = svg_cache_.try_emplace(name);
     if (!it.second) { return *it.first->second.imgui_id; }
@@ -59,4 +59,4 @@ auto texture_cache::get_or_load_svg(std::string_view name, gsl::span<char> data)
     return *it.first->second.imgui_id;
 }
 
-} // namespace pbnj::assets
+} // namespace pbnj::ui::assets

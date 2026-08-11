@@ -29,6 +29,8 @@ class texture_cache {
     [[nodiscard]] auto get_or_load_svg(std::string_view name, gsl::span<const char> data)
         -> result<ImTextureID>;
 
+    auto clear() noexcept -> void { svg_cache_.clear(); }
+
   private:
     string_map_t<texture> svg_cache_;
 };

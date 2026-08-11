@@ -39,11 +39,11 @@ namespace pbnj::ui::assets {
 struct texture {
     texture() = default;
     ~texture() {
-        if (view) { sg_destroy_view(view.take()); }
-        if (image) {
-            sg_destroy_image(image.take());
-            imgui_id.reset();
+        if (sg_isvalid()) {
+            if (view) { sg_destroy_view(view.take()); }
+            if (image) { sg_destroy_image(image.take()); }
         }
+        imgui_id.reset();
     }
     MAKE_MOVE_ONLY(texture);
 

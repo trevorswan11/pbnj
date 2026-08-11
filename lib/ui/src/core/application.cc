@@ -111,6 +111,7 @@ auto application::impl::on_event(const sapp_event* event) noexcept -> void {
 auto application::impl::on_cleanup() noexcept -> void {
     PROFILE_FUNCTION();
     root.on_unmount(ctx);
+    ctx.textures.clear();
     simgui_shutdown();
     sg_shutdown();
 }

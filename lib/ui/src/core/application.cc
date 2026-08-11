@@ -8,6 +8,7 @@
 
 #include "ui/assets/app_icon.hh"
 #include "ui/core/frame.hh"
+#include "ui/pages/home.hh"
 
 namespace pbnj::ui {
 
@@ -70,6 +71,8 @@ auto application::on_init() noexcept -> void {
     ctx_.log.info("Initialized font manager");
     ctx_.styles.apply_dark_mode();
     ctx_.log.info("Applied application-wide dark mode");
+
+    ctx_.router.emplace_page<pages::home>(ctx_);
 }
 
 auto application::on_frame() noexcept -> void {

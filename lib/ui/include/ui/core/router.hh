@@ -41,7 +41,7 @@ class router {
 
   private:
     std::vector<location> history_;
-    usize                 history_idx_;
+    usize                 history_idx_{0};
 };
 
 } // namespace pbnj::ui::core

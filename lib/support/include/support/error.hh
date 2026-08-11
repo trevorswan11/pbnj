@@ -10,6 +10,7 @@ enum class error : u8 {
     SOKOL_IMG_ALLOC_FAILED,
     SOKOL_IMG_VIEW_ALLOC_FAILED,
     INVALID_IMGUI_TEXTURE,
+    SOKOL_SAMPLER_CREATE_FAILED,
 };
 
 template <typename T> using result = stdx::result<T, error>;

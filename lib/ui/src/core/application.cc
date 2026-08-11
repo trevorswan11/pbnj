@@ -3,35 +3,52 @@
 #include <gsl/pointers>
 #include <sokol.h>
 #include <stb_image.h>
+#include <stdx/memory.hh>
 #include <stdx/profiler.hh>
 #include <stdx/types.hh>
 
 #include "ui/assets/app_icon.hh"
+#include "ui/components/root.hh"
+#include "ui/core/component.hh"
+#include "ui/core/context.hh"
 #include "ui/core/frame.hh"
 #include "ui/pages/home.hh"
 
 namespace pbnj::ui {
 
+struct application::impl {
+    context          ctx;
+    components::root root;
+
+    auto on_init() noexcept -> void;
+    auto on_frame() noexcept -> void;
+    auto on_event(const sapp_event* event) noexcept -> void;
+    auto on_cleanup() noexcept -> void;
+};
+
+application::application() : impl_(stdx::make_box<impl>()) {}
+application::~application() = default;
+
 auto application::launch() noexcept -> void {
     PROFILE_FUNCTION();
     sapp_desc desc{};
     desc.init_userdata_cb = [](void* data) noexcept -> void {
-        gsl::not_null app = static_cast<application*>(data);
+        gsl::not_null app = static_cast<impl*>(data);
         app->on_init();
     };
     desc.frame_userdata_cb = [](void* data) noexcept -> void {
-        gsl::not_null app = static_cast<application*>(data);
+        gsl::not_null app = static_cast<impl*>(data);
         app->on_frame();
     };
     desc.event_userdata_cb = [](const sapp_event* e, void* data) noexcept -> void {
-        gsl::not_null app = static_cast<application*>(data);
+        gsl::not_null app = static_cast<impl*>(data);
         app->on_event(e);
     };
     desc.cleanup_userdata_cb = [](void* data) noexcept -> void {
-        gsl::not_null app = static_cast<application*>(data);
+        gsl::not_null app = static_cast<impl*>(data);
         app->on_cleanup();
     };
-    desc.user_data                   = this;
+    desc.user_data                   = impl_.get();
     desc.window_title                = "PBnJ";
     desc.ios.keyboard_resizes_canvas = false;
     desc.icon.sokol_default          = false;
@@ -56,7 +73,7 @@ auto application::launch() noexcept -> void {
     sapp_run(desc);
 }
 
-auto application::on_init() noexcept -> void {
+auto application::impl::on_init() noexcept -> void {
     PROFILE_FUNCTION();
     sg_desc desc{};
     desc.environment = sglue_environment();
@@ -67,31 +84,33 @@ auto application::on_init() noexcept -> void {
     simgui_desc.logger.func = slog_func;
     simgui_setup(&simgui_desc);
 
-    ctx_.fonts.init(sapp_dpi_scale());
-    ctx_.log.info("Initialized font manager");
-    ctx_.styles.apply_dark_mode();
-    ctx_.log.info("Applied application-wide dark mode");
+    ctx.fonts.init(sapp_dpi_scale());
+    ctx.log.info("Initialized font manager");
+    ctx.styles.apply_dark_mode();
+    ctx.log.info("Applied application-wide dark mode");
 
-    ctx_.router.emplace_page<pages::home>(ctx_);
+    ctx.router.emplace_page<pages::home>(ctx);
+    root.on_mount(ctx);
 }
 
-auto application::on_frame() noexcept -> void {
+auto application::impl::on_frame() noexcept -> void {
     PROFILE_FUNCTION();
     const ui::frame frame;
 
     const auto dt = frame.get_dt();
-    ctx_.router.update_current(ctx_, dt);
+    ctx.router.update_current(ctx, dt);
 
-    root_.render(ctx_);
+    root.render(ctx);
 }
 
-auto application::on_event(const sapp_event* event) noexcept -> void {
+auto application::impl::on_event(const sapp_event* event) noexcept -> void {
     PROFILE_FUNCTION();
     simgui_handle_event(event);
 }
 
-auto application::on_cleanup() noexcept -> void {
+auto application::impl::on_cleanup() noexcept -> void {
     PROFILE_FUNCTION();
+    root.on_unmount(ctx);
     simgui_shutdown();
     sg_shutdown();
 }

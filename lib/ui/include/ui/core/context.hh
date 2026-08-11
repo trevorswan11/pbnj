@@ -3,6 +3,7 @@
 #include <stdx/utility.hh>
 
 #include "support/logger.hh"
+#include "ui/assets/texture_cache.hh"
 #include "ui/core/router.hh"
 #include "ui/theme/fonts.hh"
 #include "ui/theme/style.hh"
@@ -18,7 +19,8 @@ struct context {
     theme::font_manager  fonts;
     logger               log;
 
-    core::router router;
+    core::router          router;
+    assets::texture_cache textures_;
 };
 
 } // namespace pbnj::ui

@@ -5,7 +5,12 @@
 
 namespace pbnj {
 
-enum class error : u8 {};
+enum class error : u8 {
+    SVG_PARSE_FAILED,
+    SOKOL_IMG_ALLOC_FAILED,
+    SOKOL_IMG_VIEW_ALLOC_FAILED,
+    INVALID_IMGUI_TEXTURE,
+};
 
 template <typename T> using result = stdx::result<T, error>;
 

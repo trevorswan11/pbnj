@@ -4,25 +4,28 @@ const stdx = @import("../build.zig").stdx;
 const Dependency = stdx.Dependency;
 
 pub fn build(b: *std.Build, config: Dependency.Config) Dependency {
-    const upstream = b.dependency("stb", .{});
+    const upstream = b.dependency("nanosvg", .{});
     const mod = b.createModule(.{
         .optimize = config.optimize,
         .target = config.target,
         .link_libc = true,
     });
 
-    const file = b.addWriteFile("stb.cc", "#include <stb_image.h>");
-    const include = upstream.path(".");
-    mod.addIncludePath(include);
+    const file = b.addWriteFile("nanosvg.cc",
+        \\#include <nanosvg.h>
+        \\#include <nanosvgrast.h>
+    );
+    const src = upstream.path("src");
+    mod.addIncludePath(src);
     mod.addCSourceFile(.{
-        .file = file.getDirectory().path(b, "stb.cc"),
-        .flags = &.{"-DSTB_IMAGE_IMPLEMENTATION"},
+        .file = file.getDirectory().path(b, "nanosvg.cc"),
+        .flags = &.{ "-DNANOSVG_IMPLEMENTATION", "-DNANOSVGRAST_IMPLEMENTATION" },
     });
 
     const lib = b.addLibrary(.{
-        .name = "stb",
+        .name = "nanosvg",
         .root_module = mod,
     });
-    lib.installHeadersDirectory(include, "", .{});
+    lib.installHeadersDirectory(src, "", .{});
     return .{ .upstream = upstream, .artifact = lib };
 }

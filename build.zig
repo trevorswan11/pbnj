@@ -5,6 +5,7 @@ pub const stdx = @import("stdx");
 const stb = @import("third-party/stb.zig");
 const sokol = @import("third-party/sokol.zig");
 const miniaudio = @import("third-party/miniaudio.zig");
+const nanosvg = @import("third-party/nanosvg.zig");
 
 pub fn build(b: *std.Build) !void {
     const optimize = b.standardOptimizeOption(.{
@@ -360,6 +361,7 @@ fn addArtifacts(b: *std.Build, config: struct {
     const stb_dep = stb.build(b, dep_config);
     const sokol_dep = sokol.build(b, dep_config);
     const ma_dep = miniaudio.build(b, dep_config);
+    const nanosvg_dep = nanosvg.build(b, dep_config);
 
     var base_lib_config: ArtifactConfig = .{
         .name = undefined,
@@ -385,7 +387,11 @@ fn addArtifacts(b: *std.Build, config: struct {
         .link_libraries = &.{libcurl},
     }));
     const libui: Library = .init(b, base_lib_config.with("ui", .{
-        .link_libraries = &.{ sokol_dep.artifact, stb_dep.artifact },
+        .link_libraries = &.{
+            sokol_dep.artifact,
+            stb_dep.artifact,
+            nanosvg_dep.artifact,
+        },
     }));
 
     const all_pbnj_libraries = [_]*std.Build.Step.Compile{

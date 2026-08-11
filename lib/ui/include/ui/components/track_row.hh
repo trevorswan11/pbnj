@@ -31,6 +31,8 @@ class track_row : public component, private track_row_props {
   public:
     explicit track_row(track_row_props props) noexcept : track_row_props{std::move(props)} {}
 
+    auto on_mount(context& ctx) -> void override;
+    auto on_unmount(context& ctx) -> void override;
     auto render(context& ctx) -> void override;
 };
 

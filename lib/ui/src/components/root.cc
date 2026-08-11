@@ -1,13 +1,19 @@
 #include "ui/components/root.hh"
 
 #include <sokol.h>
+#include <stdx/profiler.hh>
 #include <stdx/utility.hh>
 
 #include "ui/core/context.hh"
 
 namespace pbnj::ui::components {
 
+auto root::on_mount(context& ctx) -> void { ctx.log.info("Mounted root component"); }
+
+auto root::on_unmount(context& ctx) -> void { ctx.log.info("Unmounted root component"); }
+
 auto root::render(context& ctx) -> void {
+    PROFILE_FUNCTION();
     const auto dpi    = sapp_dpi_scale();
     const auto width  = sapp_widthf() / dpi;
     const auto height = sapp_heightf() / dpi;

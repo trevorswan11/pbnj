@@ -32,6 +32,7 @@ auto style_manager::apply_dark_mode() noexcept -> void {
 
     using namespace colors;
 
+    // cppcheck-suppress-begin unreadVariable
     gsl::span colors                  = style.Colors;
     colors[ImGuiCol_WindowBg]         = as_imgui_color(dark_grey);
     colors[ImGuiCol_ChildBg]          = as_imgui_color(light_dark_grey);
@@ -42,6 +43,7 @@ auto style_manager::apply_dark_mode() noexcept -> void {
     colors[ImGuiCol_ButtonHovered]    = as_imgui_color(light_grey);
     colors[ImGuiCol_SliderGrab]       = as_imgui_color(dark_light_green);
     colors[ImGuiCol_SliderGrabActive] = as_imgui_color(light_green);
+    // cppcheck-suppress-end unreadVariable
 }
 
 } // namespace pbnj::ui::theme

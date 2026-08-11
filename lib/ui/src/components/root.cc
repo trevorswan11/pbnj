@@ -9,10 +9,10 @@
 namespace pbnj::ui::components {
 
 auto root::on_mount(context& ctx) -> void {
-    ctx.log.info("Mounted root component");
     top_bar_.on_mount(ctx);
     side_bar_.on_mount(ctx);
     player_bar_.on_mount(ctx);
+    ctx.log.info("Mounted root component");
 }
 
 auto root::on_unmount(context& ctx) -> void {

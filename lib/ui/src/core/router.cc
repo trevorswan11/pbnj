@@ -42,7 +42,7 @@ auto router::transition_to(context& ctx, location next_page) -> void {
     }
 
     next_page->on_mount(ctx);
-    history_.emplace_back(std::move(std::move(next_page)));
+    history_.emplace_back(std::move(next_page));
     history_idx_ = history_.size() - 1;
 }
 

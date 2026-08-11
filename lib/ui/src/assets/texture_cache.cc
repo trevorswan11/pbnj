@@ -19,8 +19,7 @@ namespace pbnj::ui::assets {
 
 auto texture_cache::get_or_load_svg(std::string_view name, gsl::span<const char> data)
     -> result<ImTextureID> {
-    auto it = svg_cache_.try_emplace(name);
-    if (!it.second) { return *it.first->second.imgui_id; }
+    if (auto it = svg_cache_.find(name); it != svg_cache_.end()) { return *it->second.imgui_id; }
 
     std::string data_copy{data.data(), data.size()};
     auto*       svg = nsvgParse(data_copy.data(), "px", 96.0f);
@@ -57,8 +56,8 @@ auto texture_cache::get_or_load_svg(std::string_view name, gsl::span<const char>
     tex.imgui_id = simgui_imtextureid(*tex.view);
     if (!tex.imgui_id) { return stdx::err{error::INVALID_IMGUI_TEXTURE}; }
 
-    it.first->second = std::move(tex);
-    return *it.first->second.imgui_id;
+    auto [it, _] = svg_cache_.emplace(name, std::move(tex));
+    return *it->second.imgui_id;
 }
 
 } // namespace pbnj::ui::assets

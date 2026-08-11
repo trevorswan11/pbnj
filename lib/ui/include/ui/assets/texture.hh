@@ -45,7 +45,24 @@ struct texture {
         }
         imgui_id.reset();
     }
-    MAKE_MOVE_ONLY(texture);
+    texture(const texture&)                    = delete;
+    auto operator=(const texture&) -> texture& = delete;
+
+    texture(texture&& other) noexcept
+        : image{other.image.take()}, view{other.view.take()}, imgui_id{other.imgui_id.take()} {}
+
+    auto operator=(texture&& other) noexcept -> texture& {
+        if (this != &other) {
+            if (sg_isvalid()) {
+                if (view) { sg_destroy_view(view.take()); }
+                if (image) { sg_destroy_image(image.take()); }
+            }
+            image    = other.image.take();
+            view     = other.view.take();
+            imgui_id = other.imgui_id.take();
+        }
+        return *this;
+    }
 
     stdx::option<sg_image>    image;
     stdx::option<sg_view>     view;

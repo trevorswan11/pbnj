@@ -25,24 +25,32 @@ auto top_bar::on_unmount(context& ctx) -> void { ctx.log.info("Unmounted top bar
 auto top_bar::render(context& ctx) -> void {
     PROFILE_FUNCTION();
 
+    constexpr auto frame_padding = 6.0f;
+    constexpr auto image_wh      = 18.0f;
+    constexpr auto button_h      = image_wh + 2 * frame_padding;
+
     ImGui::PushStyleColor(ImGuiCol_Button, {0, 0, 0, 0});
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, {1, 1, 1, 0.08f});
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, {1, 1, 1, 0.16f});
     const auto color_cleanup = gsl::finally([] { ImGui::PopStyleColor(3); });
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 100.0f);
-    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {6, 6});
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {frame_padding, frame_padding});
     const auto style_cleanup = gsl::finally([] { ImGui::PopStyleVar(2); });
 
     const auto can_go_back = ctx.router.can_go_back();
+    ImGui::SetCursorPosY((ImGui::GetWindowHeight() - button_h) * 0.5f);
     if (!can_go_back) { ImGui::BeginDisabled(); }
-    if (ImGui::ImageButton("#back", back_, {18, 18})) { ctx.router.go_back(ctx); }
+    if (ImGui::ImageButton("#back", back_, {image_wh, image_wh})) { ctx.router.go_back(ctx); }
     if (!can_go_back) { ImGui::EndDisabled(); }
 
     ImGui::SameLine();
 
-    const auto can_go_fwd = ctx.router.can_go_back();
+    const auto can_go_fwd = ctx.router.can_go_forward();
+    ImGui::SetCursorPosY((ImGui::GetWindowHeight() - button_h) * 0.5f);
     if (!can_go_fwd) { ImGui::BeginDisabled(); }
-    if (ImGui::ImageButton("#forward", forward_, {18, 18})) { ctx.router.go_forward(ctx); }
+    if (ImGui::ImageButton("#forward", forward_, {image_wh, image_wh})) {
+        ctx.router.go_forward(ctx);
+    }
     if (!can_go_fwd) { ImGui::EndDisabled(); }
 }
 

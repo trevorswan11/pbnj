@@ -15,7 +15,7 @@ class application {
     auto launch() noexcept -> void;
 
   private:
-    struct impl;
+    class impl;
 
   private:
     stdx::box<impl> impl_;

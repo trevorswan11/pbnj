@@ -16,15 +16,17 @@
 
 namespace pbnj::ui {
 
-struct application::impl {
-    context          ctx;
-    components::root root;
-    f32              current_dpi;
-
+class application::impl {
+  public:
     auto on_init() noexcept -> void;
     auto on_frame() noexcept -> void;
     auto on_event(const sapp_event* event) noexcept -> void;
     auto on_cleanup() noexcept -> void;
+
+  private:
+    context          ctx_;
+    components::root root_;
+    f32              current_dpi_;
 };
 
 application::application() : impl_(stdx::make_box<impl>()) {}
@@ -85,14 +87,14 @@ auto application::impl::on_init() noexcept -> void {
     simgui_desc.logger.func = slog_func;
     simgui_setup(&simgui_desc);
 
-    ctx.fonts.init(sapp_dpi_scale());
-    ctx.log.info("Initialized font manager");
-    ctx.styles.apply_dark_mode();
-    ctx.log.info("Applied application-wide dark mode");
+    current_dpi_ = sapp_dpi_scale();
+    ctx_.fonts.init(current_dpi_);
+    ctx_.log.info("Initialized font manager");
+    ctx_.styles.apply_dark_mode();
+    ctx_.log.info("Applied application-wide dark mode");
 
-    ctx.router.emplace_page<pages::home>(ctx);
-    root.on_mount(ctx);
-    current_dpi = sapp_dpi_scale();
+    ctx_.router.emplace_page<pages::home>(ctx_);
+    root_.on_mount(ctx_);
 }
 
 auto application::impl::on_frame() noexcept -> void {
@@ -100,9 +102,9 @@ auto application::impl::on_frame() noexcept -> void {
     const ui::frame frame;
 
     const auto dt = frame.get_dt();
-    ctx.router.update_current(ctx, dt);
+    ctx_.router.update_current(ctx_, dt);
 
-    root.render(ctx);
+    root_.render(ctx_);
 }
 
 auto application::impl::on_event(const sapp_event* event) noexcept -> void {
@@ -111,17 +113,17 @@ auto application::impl::on_event(const sapp_event* event) noexcept -> void {
 
     if (event->type == SAPP_EVENTTYPE_RESIZED) {
         const auto dpi = sapp_dpi_scale();
-        if (dpi != current_dpi) {
-            current_dpi = dpi;
-            ctx.textures.clear();
+        if (dpi != current_dpi_) {
+            current_dpi_ = dpi;
+            ctx_.textures.clear();
         }
     }
 }
 
 auto application::impl::on_cleanup() noexcept -> void {
     PROFILE_FUNCTION();
-    root.on_unmount(ctx);
-    ctx.textures.clear();
+    root_.on_unmount(ctx_);
+    ctx_.textures.clear();
     simgui_shutdown();
     sg_shutdown();
 }

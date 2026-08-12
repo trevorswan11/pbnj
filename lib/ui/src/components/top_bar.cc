@@ -2,56 +2,52 @@
 
 #include <gsl/util>
 #include <imgui.h>
+#include <stdx/assert.hh>
 #include <stdx/profiler.hh>
 #include <stdx/utility.hh>
 
-#include "ui/assets/lucide.hh"
+#include "ui/assets/texture_cache.hh"
 #include "ui/core/context.hh"
 
 namespace pbnj::ui::components {
 
+top_bar::top_bar()
+    : back_{{
+          .tag         = "#back",
+          .icon_id     = assets::core_icon_id_t::CHEVRON_LEFT,
+          .is_disabled = [](const context& ctx) { return !ctx.router.can_go_back(); },
+          .on_click    = [](context& ctx) { ctx.router.go_back(ctx); },
+      }},
+      forward_{{
+          .tag         = "#forward",
+          .icon_id     = assets::core_icon_id_t::CHEVRON_RIGHT,
+          .is_disabled = [](const context& ctx) { return !ctx.router.can_go_forward(); },
+          .on_click    = [](context& ctx) { ctx.router.go_forward(ctx); },
+      }},
+      padded_nav_button_height_{back_.width() + 2 * back_.frame_padding()} {
+    ASSERT(back_.width() == back_.height());
+    ASSERT(back_.width() == forward_.width());
+    ASSERT(back_.frame_padding() == forward_.frame_padding());
+}
+
 auto top_bar::on_mount(context& ctx) -> void {
-    back_ = ctx.textures.get_or_load_svg("chevron_left", assets::chevron_left)
-                .value_or(ImTextureID_Invalid);
-    ctx.log.info("Created back button at texture: {}", back_);
-    forward_ = ctx.textures.get_or_load_svg("chevron_right", assets::chevron_right)
-                   .value_or(ImTextureID_Invalid);
-    ctx.log.info("Created forward button at texture: {}", forward_);
+    back_.on_mount(ctx);
+    forward_.on_mount(ctx);
     ctx.log.info("Mounted top bar");
 }
 
-auto top_bar::on_unmount(context& ctx) -> void { ctx.log.info("Unmounted top bar"); }
+auto top_bar::on_unmount(context& ctx) -> void {
+    forward_.on_unmount(ctx);
+    back_.on_unmount(ctx);
+    ctx.log.info("Unmounted top bar");
+}
 
 auto top_bar::render(context& ctx) -> void {
     PROFILE_FUNCTION();
-
-    constexpr auto frame_padding = 6.0f;
-    constexpr auto image_wh      = 18.0f;
-    constexpr auto button_h      = image_wh + 2 * frame_padding;
-
-    ImGui::PushStyleColor(ImGuiCol_Button, {0, 0, 0, 0});
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, {1, 1, 1, 0.08f});
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, {1, 1, 1, 0.16f});
-    const auto color_cleanup = gsl::finally([] { ImGui::PopStyleColor(3); });
-    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 100.0f);
-    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {frame_padding, frame_padding});
-    const auto style_cleanup = gsl::finally([] { ImGui::PopStyleVar(2); });
-
-    const auto can_go_back = ctx.router.can_go_back();
-    ImGui::SetCursorPosY((ImGui::GetWindowHeight() - button_h) * 0.5f);
-    if (!can_go_back) { ImGui::BeginDisabled(); }
-    if (ImGui::ImageButton("#back", back_, {image_wh, image_wh})) { ctx.router.go_back(ctx); }
-    if (!can_go_back) { ImGui::EndDisabled(); }
-
+    ImGui::SetCursorPosY((ImGui::GetWindowHeight() - padded_nav_button_height_) * 0.5f);
+    back_.render(ctx);
     ImGui::SameLine();
-
-    const auto can_go_fwd = ctx.router.can_go_forward();
-    ImGui::SetCursorPosY((ImGui::GetWindowHeight() - button_h) * 0.5f);
-    if (!can_go_fwd) { ImGui::BeginDisabled(); }
-    if (ImGui::ImageButton("#forward", forward_, {image_wh, image_wh})) {
-        ctx.router.go_forward(ctx);
-    }
-    if (!can_go_fwd) { ImGui::EndDisabled(); }
+    forward_.render(ctx);
 }
 
 } // namespace pbnj::ui::components

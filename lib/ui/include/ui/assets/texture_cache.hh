@@ -14,18 +14,22 @@
 #include <stdx/utility.hh>
 
 #include "support/error.hh"
-#include "ui/assets/icons.hh"
 #include "ui/assets/texture.hh"
 #include "ui/core/compact_types.hh" // IWYU pragma: keep
 
 namespace pbnj::ui::assets {
+
+enum class core_icon_id_t : u8 {
+    CHEVRON_LEFT,
+    CHEVRON_RIGHT,
+};
 
 class texture_cache {
   public:
     template <typename V>
     using string_map_t = ankerl::unordered_dense::
         map<std::string, V, stdx::string_transparent_hash, stdx::string_transparent_eq>;
-    using core_icon_map_t = stdx::fixed::enum_map<icon, stdx::option<texture>>;
+    using core_icon_map_t = stdx::fixed::enum_map<core_icon_id_t, stdx::option<texture>>;
 
   public:
     texture_cache() = default;
@@ -34,7 +38,7 @@ class texture_cache {
 
     [[nodiscard]] auto get_or_load_svg(std::string_view name, gsl::span<const char> data)
         -> result<ImTextureID>;
-    [[nodiscard]] auto get_icon(icon ic) -> ImTextureID;
+    [[nodiscard]] auto get_core_icon(core_icon_id_t id) -> ImTextureID;
     [[nodiscard]] auto fallback_texture() noexcept -> ImTextureID;
 
     auto clear() noexcept -> void;

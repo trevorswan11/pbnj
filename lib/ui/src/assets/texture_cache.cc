@@ -16,7 +16,6 @@
 #include <stdx/types.hh>
 
 #include "support/error.hh"
-#include "ui/assets/icons.hh"
 #include "ui/assets/lucide.hh"
 #include "ui/assets/texture.hh"
 
@@ -29,14 +28,14 @@ auto texture_cache::get_or_load_svg(std::string_view name, gsl::span<const char>
     return *it->second.imgui_id;
 }
 
-auto texture_cache::get_icon(icon ic) -> ImTextureID {
-    auto& tex = core_icons_[ic];
+auto texture_cache::get_core_icon(core_icon_id_t id) -> ImTextureID {
+    auto& tex = core_icons_[id];
     if (tex) { return *tex->imgui_id; }
 
-    auto data = [ic] -> gsl::span<const char> {
-        switch (ic) {
-        case icon::CHEVRON_LEFT:  return assets::chevron_left;
-        case icon::CHEVRON_RIGHT: return assets::chevron_right;
+    auto data = [id] -> gsl::span<const char> {
+        switch (id) {
+        case core_icon_id_t::CHEVRON_LEFT:  return assets::chevron_left;
+        case core_icon_id_t::CHEVRON_RIGHT: return assets::chevron_right;
         }
         UNREACHABLE("Invalid core icon id");
     }();

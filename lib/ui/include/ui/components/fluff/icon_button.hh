@@ -36,9 +36,6 @@ class icon_button : public component, private icon_button_props {
     [[nodiscard]] auto frame_padding() const noexcept { return padding; }
     [[nodiscard]] auto width() const noexcept { return size.x; }
     [[nodiscard]] auto height() const noexcept { return size.y; }
-
-  private:
-    ImTextureID texture_;
 };
 
 } // namespace pbnj::ui::components

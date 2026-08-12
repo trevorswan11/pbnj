@@ -6,7 +6,7 @@
 
 namespace pbnj::ui {
 
-frame::frame(glm::vec4 clear_color) noexcept
+frame::frame(ImVec4 clear_color) noexcept
     : width_{sapp_width()}, height_{sapp_height()}, dt_{sapp_frame_duration()},
       dpi_scale_{sapp_dpi_scale()}, clear_color_{clear_color} {
     const simgui_frame_desc_t frame_desc{

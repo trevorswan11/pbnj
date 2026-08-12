@@ -19,6 +19,7 @@ namespace pbnj::ui {
 struct application::impl {
     context          ctx;
     components::root root;
+    f32              current_dpi;
 
     auto on_init() noexcept -> void;
     auto on_frame() noexcept -> void;
@@ -91,6 +92,7 @@ auto application::impl::on_init() noexcept -> void {
 
     ctx.router.emplace_page<pages::home>(ctx);
     root.on_mount(ctx);
+    current_dpi = sapp_dpi_scale();
 }
 
 auto application::impl::on_frame() noexcept -> void {
@@ -106,6 +108,14 @@ auto application::impl::on_frame() noexcept -> void {
 auto application::impl::on_event(const sapp_event* event) noexcept -> void {
     PROFILE_FUNCTION();
     simgui_handle_event(event);
+
+    if (event->type == SAPP_EVENTTYPE_RESIZED) {
+        const auto dpi = sapp_dpi_scale();
+        if (dpi != current_dpi) {
+            current_dpi = dpi;
+            ctx.textures.clear();
+        }
+    }
 }
 
 auto application::impl::on_cleanup() noexcept -> void {

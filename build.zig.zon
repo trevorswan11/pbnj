@@ -24,10 +24,6 @@
             .url = "https://github.com/mackron/miniaudio/archive/refs/tags/0.11.25.tar.gz",
             .hash = "N-V-__8AAHNWwAASlNuYbrP1-3UqXdwbYvZ_6nIJhpAcRMfi",
         },
-        .glm = .{
-            .url = "https://github.com/g-truc/glm/archive/refs/tags/1.0.3.tar.gz",
-            .hash = "N-V-__8AADFHSQGUm7CC8Ibuzitl6mDJil4WgOaZibOvnm_3",
-        },
         .nanosvg = .{
             .url = "https://github.com/memononen/nanosvg/archive/239e102ec2c691f2902e20ace2ed36ee4a35cfe6.tar.gz",
             .hash = "N-V-__8AAE5yBwD_bLZNt1HvBZCk6poKiYnxBFzEuwomFCsa",

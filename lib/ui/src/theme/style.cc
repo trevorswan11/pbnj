@@ -34,15 +34,15 @@ auto style_manager::apply_dark_mode() noexcept -> void {
 
     // cppcheck-suppress-begin unreadVariable
     gsl::span colors                  = style.Colors;
-    colors[ImGuiCol_WindowBg]         = as_imgui_color(dark_grey);
-    colors[ImGuiCol_ChildBg]          = as_imgui_color(light_dark_grey);
-    colors[ImGuiCol_PopupBg]          = as_imgui_color(grey);
-    colors[ImGuiCol_Header]           = as_imgui_color(dark_light_grey);
-    colors[ImGuiCol_HeaderHovered]    = as_imgui_color(light_grey);
-    colors[ImGuiCol_Button]           = as_imgui_color(dark_light_grey);
-    colors[ImGuiCol_ButtonHovered]    = as_imgui_color(light_grey);
-    colors[ImGuiCol_SliderGrab]       = as_imgui_color(dark_light_green);
-    colors[ImGuiCol_SliderGrabActive] = as_imgui_color(light_green);
+    colors[ImGuiCol_WindowBg]         = dark_grey;
+    colors[ImGuiCol_ChildBg]          = light_dark_grey;
+    colors[ImGuiCol_PopupBg]          = grey;
+    colors[ImGuiCol_Header]           = dark_light_grey;
+    colors[ImGuiCol_HeaderHovered]    = light_grey;
+    colors[ImGuiCol_Button]           = dark_light_grey;
+    colors[ImGuiCol_ButtonHovered]    = light_grey;
+    colors[ImGuiCol_SliderGrab]       = dark_light_green;
+    colors[ImGuiCol_SliderGrabActive] = light_green;
     // cppcheck-suppress-end unreadVariable
 }
 

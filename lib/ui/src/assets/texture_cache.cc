@@ -66,7 +66,8 @@ auto texture_cache::ensure_fallback_texture() noexcept -> result<void> {
 }
 
 auto texture_cache::ensure_sampler() noexcept -> result<void> {
-    if (!linear_sampler_ && sg_isvalid()) {
+    if (!sg_isvalid()) { return stdx::err{error::SOKOL_SAMPLER_CREATE_FAILED}; }
+    if (!linear_sampler_) {
         sg_sampler_desc desc{};
         desc.min_filter = SG_FILTER_LINEAR;
         desc.mag_filter = SG_FILTER_LINEAR;

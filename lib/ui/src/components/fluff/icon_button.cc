@@ -29,9 +29,10 @@ auto icon_button::render(context& ctx) -> void {
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {padding, padding});
     const auto style_cleanup = gsl::finally([] { ImGui::PopStyleVar(2); });
 
-    const bool disabled = is_disabled && is_disabled(ctx);
+    const bool   disabled = is_disabled && is_disabled(ctx);
+    const ImVec4 tint{1, 1, 1, disabled ? disabled_tint : 1};
     if (disabled) { ImGui::BeginDisabled(); }
-    if (ImGui::ImageButton(tag.c_str(), texture_, size)) {
+    if (ImGui::ImageButton(tag.c_str(), texture_, size, {0, 0}, {1, 1}, {0, 0, 0, 0}, tint)) {
         if (on_click) { on_click(ctx); }
     }
     if (disabled) { ImGui::EndDisabled(); }

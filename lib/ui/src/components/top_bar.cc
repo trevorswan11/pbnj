@@ -13,13 +13,13 @@ namespace pbnj::ui::components {
 
 top_bar::top_bar()
     : back_{{
-          .tag         = "#back",
+          .tag         = "##back",
           .icon_id     = assets::core_icon_id_t::CHEVRON_LEFT,
           .is_disabled = [](const context& ctx) { return !ctx.router.can_go_back(); },
           .on_click    = [](context& ctx) { ctx.router.go_back(ctx); },
       }},
       forward_{{
-          .tag         = "#forward",
+          .tag         = "##forward",
           .icon_id     = assets::core_icon_id_t::CHEVRON_RIGHT,
           .is_disabled = [](const context& ctx) { return !ctx.router.can_go_forward(); },
           .on_click    = [](context& ctx) { ctx.router.go_forward(ctx); },

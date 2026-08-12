@@ -19,6 +19,7 @@ struct icon_button_props {
     std::string                          tag;
     assets::core_icon_id_t               icon_id;
     f32                                  padding{6.0f};
+    f32                                  disabled_tint{0.25f};
     ImVec2                               size{18.0f, 18.0f};
     stdx::function<bool(const context&)> is_disabled;
     stdx::function<void(context&)>       on_click;

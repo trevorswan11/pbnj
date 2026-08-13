@@ -21,8 +21,8 @@ struct icon_button_props {
     f32                                  padding{6.0f};
     f32                                  disabled_tint{0.25f};
     ImVec2                               size{18.0f, 18.0f};
-    stdx::function<bool(const context&)> is_disabled;
-    stdx::function<void(context&)>       on_click;
+    stdx::function<bool(const context&)> is_disabled{[](const context&) { return false; }};
+    stdx::function<void(context&)>       on_click{nullptr};
 };
 
 class icon_button : public component, private icon_button_props {

@@ -16,9 +16,13 @@ class top_bar : public component {
     auto render(context& ctx) -> void override;
 
   private:
+    icon_button menu_;
     icon_button back_;
     icon_button forward_;
-    f32         padded_nav_button_height_;
+    icon_button home_;
+    icon_button search_;
+    
+    f32         padded_icon_button_dim_;
 };
 
 } // namespace pbnj::ui::components

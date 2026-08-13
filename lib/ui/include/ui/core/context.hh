@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include <stdx/utility.hh>
 
 #include "support/logger.hh"
@@ -21,6 +23,7 @@ struct context {
 
     core::router          router;
     assets::texture_cache textures;
+    std::string           search_input;
 };
 
 } // namespace pbnj::ui

@@ -1,5 +1,6 @@
 #include "ui/assets/texture_cache.hh"
 
+#include <array>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -21,6 +22,14 @@
 
 namespace pbnj::ui::assets {
 
+namespace {
+
+// 2x2 RGBA8 Magenta
+constexpr auto fallback_pixels =
+    std::to_array<u8>({255, 0, 255, 255, 24, 24, 24, 255, 24, 24, 24, 255, 255, 0, 255, 255});
+
+} // namespace
+
 auto texture_cache::get_or_load_svg(std::string_view name, gsl::span<const char> data)
     -> result<ImTextureID> {
     if (auto it = svg_cache_.find(name); it != svg_cache_.end()) { return *it->second.imgui_id; }
@@ -36,6 +45,19 @@ auto texture_cache::get_core_icon(core_icon_id_t id) -> ImTextureID {
         switch (id) {
         case core_icon_id_t::CHEVRON_LEFT:  return assets::chevron_left;
         case core_icon_id_t::CHEVRON_RIGHT: return assets::chevron_right;
+        case core_icon_id_t::CLOSE:         return assets::close;
+        case core_icon_id_t::HOME:          return assets::home;
+        case core_icon_id_t::MENU:          return assets::menu;
+        case core_icon_id_t::PAUSE:         return assets::pause;
+        case core_icon_id_t::PLAY:          return assets::play;
+        case core_icon_id_t::SEARCH:        return assets::search;
+        case core_icon_id_t::SKIP_BACK:     return assets::skip_back;
+        case core_icon_id_t::SKIP_FORWARD:  return assets::skip_forward;
+        case core_icon_id_t::USER_ROUND:    return assets::user_round;
+        case core_icon_id_t::VOLUME_ZERO:   return assets::volume_0;
+        case core_icon_id_t::VOLUME_ONE:    return assets::volume_1;
+        case core_icon_id_t::VOLUME_TWO:    return assets::volume_2;
+        case core_icon_id_t::MUTED_VOLUME:  return assets::volume_x;
         }
         UNREACHABLE("Invalid core icon id");
     }();
@@ -98,18 +120,24 @@ auto texture_cache::load_svg_internal(gsl::span<const char> data) -> result<text
     const auto rast_delete = gsl::finally([rast] { nsvgDeleteRasterizer(rast); });
     nsvgRasterize(rast, svg, 0, 0, dpi_scale, pixels.get(), render_w, render_h, render_w * 4);
 
+    for (usize i = 0; i < image_size; i += 4) {
+        pixels[i + 0] = 255;
+        pixels[i + 1] = 255;
+        pixels[i + 2] = 255;
+    }
+
     return create_texture(render_w, render_h, gsl::span{pixels.get(), image_size});
 }
 
-auto texture_cache::create_texture(i32 width, i32 height, gsl::span<const u8> data) noexcept
+auto texture_cache::create_texture(i32 width, i32 height, gsl::span<const u8> raw_bytes) noexcept
     -> result<texture> {
     sg_image_desc img_desc{};
     img_desc.width                   = width;
     img_desc.height                  = height;
     img_desc.pixel_format            = SG_PIXELFORMAT_RGBA8;
     img_desc.num_mipmaps             = 1;
-    img_desc.data.mip_levels[0].ptr  = data.data();
-    img_desc.data.mip_levels[0].size = data.size();
+    img_desc.data.mip_levels[0].ptr  = raw_bytes.data();
+    img_desc.data.mip_levels[0].size = raw_bytes.size();
 
     texture tex;
     tex.image = sg_make_image(img_desc);
@@ -117,7 +145,7 @@ auto texture_cache::create_texture(i32 width, i32 height, gsl::span<const u8> da
 
     sg_view_desc view_desc{};
     view_desc.texture.image = *tex.image;
-    tex.view                = sg_make_view(&view_desc);
+    tex.view                = sg_make_view(view_desc);
     if (!tex.view) { return stdx::err{error::SOKOL_IMG_VIEW_ALLOC_FAILED}; }
 
     TRY(ensure_sampler());

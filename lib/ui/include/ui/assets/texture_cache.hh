@@ -1,6 +1,5 @@
 #pragma once
 
-#include <array>
 #include <string>
 #include <string_view>
 
@@ -20,8 +19,21 @@
 namespace pbnj::ui::assets {
 
 enum class core_icon_id_t : u8 {
-    CHEVRON_LEFT,
-    CHEVRON_RIGHT,
+    CHEVRON_LEFT,  // Navbar back button
+    CHEVRON_RIGHT, // Navbar forward button
+    CLOSE,         // 'x' close button
+    HOME,          // Navbar home button
+    MENU,          // Navbar menu button (3 horizontal lines)
+    PAUSE,         // Pause button
+    PLAY,          // Play button
+    SEARCH,        // Magnifying glass
+    SKIP_BACK,     // Skip back button
+    SKIP_FORWARD,  // Skip forward button
+    USER_ROUND,    // Unknown album cover
+    VOLUME_ZERO,   // Lowest volume
+    VOLUME_ONE,    // Medium volume
+    VOLUME_TWO,    // Highest volume
+    MUTED_VOLUME,  // Volume fully muted
 };
 
 class texture_cache {
@@ -44,16 +56,11 @@ class texture_cache {
     auto clear() noexcept -> void;
 
   private:
-    // 2x2 RGBA8 Magenta
-    static constexpr auto fallback_pixels =
-        std::to_array<u8>({255, 0, 255, 255, 24, 24, 24, 255, 24, 24, 24, 255, 255, 0, 255, 255});
-
-  private:
     [[nodiscard]] auto ensure_sampler() noexcept -> result<void>;
     [[nodiscard]] auto ensure_fallback_texture() noexcept -> result<void>;
 
     [[nodiscard]] auto load_svg_internal(gsl::span<const char> data) -> result<texture>;
-    [[nodiscard]] auto create_texture(i32 width, i32 height, gsl::span<const u8> data) noexcept
+    [[nodiscard]] auto create_texture(i32 width, i32 height, gsl::span<const u8> raw_bytes) noexcept
         -> result<texture>;
 
   private:

@@ -5,6 +5,7 @@
 #include <stdx/profiler.hh>
 
 #include "ui/core/context.hh"
+#include "ui/theme/colors.hh"
 
 namespace pbnj::ui::components {
 
@@ -18,19 +19,22 @@ auto icon_button::render(context& ctx) -> void {
     PROFILE_FUNCTION();
     const auto texture = ctx.textures.get_core_icon(icon_id);
 
-    ImGui::PushStyleColor(ImGuiCol_Button, {0, 0, 0, 0});
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, {1, 1, 1, 0.08f});
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, {1, 1, 1, 0.16f});
+    ImGui::PushStyleColor(ImGuiCol_Button, theme::colors::transparent);
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, theme::colors::ghost_hover);
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, theme::colors::ghost_active);
     const auto color_cleanup = gsl::finally([] { ImGui::PopStyleColor(3); });
 
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 100.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {padding, padding});
     const auto style_cleanup = gsl::finally([] { ImGui::PopStyleVar(2); });
 
-    const bool   disabled = is_disabled && is_disabled(ctx);
-    const ImVec4 tint{1, 1, 1, disabled ? disabled_tint : 1};
+    const bool disabled = is_disabled && is_disabled(ctx);
+    ImVec4     tint{theme::colors::white};
+    if (disabled) { tint.w = disabled_tint; }
+
     if (disabled) { ImGui::BeginDisabled(); }
-    if (ImGui::ImageButton(tag.c_str(), texture, size, {0, 0}, {1, 1}, {0, 0, 0, 0}, tint)) {
+    if (ImGui::ImageButton(
+            tag.c_str(), texture, size, {0, 0}, {1, 1}, theme::colors::transparent, tint)) {
         if (on_click) { on_click(ctx); }
     }
     if (disabled) { ImGui::EndDisabled(); }

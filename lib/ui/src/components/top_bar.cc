@@ -55,11 +55,11 @@ auto top_bar::on_mount(context& ctx) -> void {
 }
 
 auto top_bar::on_unmount(context& ctx) -> void {
-    search_.on_mount(ctx);
-    home_.on_mount(ctx);
+    search_.on_unmount(ctx);
+    home_.on_unmount(ctx);
     forward_.on_unmount(ctx);
     back_.on_unmount(ctx);
-    menu_.on_mount(ctx);
+    menu_.on_unmount(ctx);
     ctx.log.info("Unmounted top bar");
 }
 

@@ -1,5 +1,6 @@
 #include "ui/pages/search.hh"
 
+#include <imgui.h>
 #include <stdx/profiler.hh>
 #include <stdx/utility.hh>
 
@@ -14,7 +15,12 @@ auto search::on_unmount(context& ctx) -> void { ctx.log.info("Unmounted search p
 
 auto search::render(context& ctx) -> void {
     PROFILE_FUNCTION();
-    DISCARD(ctx);
+
+    if (ctx.search_input.empty()) {
+        ImGui::TextDisabled("Type something in the top bar to search...");
+    } else {
+        ImGui::Text("Results for \"%s\":", ctx.search_input.c_str());
+    }
 }
 
 } // namespace pbnj::ui::pages

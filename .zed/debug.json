@@ -19,15 +19,31 @@
     },
     {
         "adapter": "CodeLLDB",
-        "label": "test-audio (C++)",
+        "label": "test-ai (C++)",
         "request": "launch",
-        "name": "test-exec",
-        "program": "zig-out/tests/audio",
+        "name": "test-ai",
+        "program": "zig-out/tests/ai",
         "build": {
             "command": "zig",
             "args": [
                 "build",
-                "test-audio",
+                "test-ai",
+                "-Dinstall-tests-only"
+            ]
+        },
+        "stopOnEntry": false
+    },
+    {
+        "adapter": "CodeLLDB",
+        "label": "test-diff (C++)",
+        "request": "launch",
+        "name": "test-diff",
+        "program": "zig-out/tests/diff",
+        "build": {
+            "command": "zig",
+            "args": [
+                "build",
+                "test-diff",
                 "-Dinstall-tests-only"
             ]
         },

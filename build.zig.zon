@@ -20,10 +20,6 @@
             .url = "https://github.com/nothings/stb/archive/31c1ad37456438565541f4919958214b6e762fb4.tar.gz",
             .hash = "N-V-__8AAN1DTgAKvlSQnjJwSg4ZY2JP5OHmzKOcA4BewA4Y",
         },
-        .miniaudio = .{
-            .url = "https://github.com/mackron/miniaudio/archive/refs/tags/0.11.25.tar.gz",
-            .hash = "N-V-__8AAHNWwAASlNuYbrP1-3UqXdwbYvZ_6nIJhpAcRMfi",
-        },
         .nanosvg = .{
             .url = "https://github.com/memononen/nanosvg/archive/239e102ec2c691f2902e20ace2ed36ee4a35cfe6.tar.gz",
             .hash = "N-V-__8AAE5yBwD_bLZNt1HvBZCk6poKiYnxBFzEuwomFCsa",

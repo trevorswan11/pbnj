@@ -1,9 +1,9 @@
-#include "audio/stub.hh"
+#include "ai/stub.hh"
 
 #include <stdx/types.hh>
 
-namespace pbnj::audio {
+namespace pbnj::ai {
 
 auto some_really_complicated_work(i32 a, i32 b) noexcept -> i32 { return a + b; }
 
-} // namespace pbnj::audio
+} // namespace pbnj::ai

@@ -6,7 +6,7 @@
 
 namespace pbnj::tests {
 
-TEST_CASE("Stub") {
+TEST_CASE("Diff Stub") {
     stdx::option<i32> a{1};
     CHECK(UNWRAP(a) == 1);
 }

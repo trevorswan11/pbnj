@@ -4,7 +4,6 @@ pub const stdx = @import("stdx");
 
 const stb = @import("third-party/stb.zig");
 const sokol = @import("third-party/sokol.zig");
-const miniaudio = @import("third-party/miniaudio.zig");
 const nanosvg = @import("third-party/nanosvg.zig");
 
 pub fn build(b: *std.Build) !void {
@@ -62,8 +61,9 @@ pub fn build(b: *std.Build) !void {
         if (artifacts.tests) |tests| {
             var include_patterns: stdx.ArrayList([]const u8) = .init(b);
             const libraries = [_][]const u8{
-                "audio",    "network",
-                "services", "ui",
+                "ai",      "diff",
+                "network", "services",
+                "ui",
             };
             for (libraries) |library| {
                 include_patterns.append(b.fmt("lib/{s}/src", .{library}));
@@ -324,7 +324,8 @@ fn addArtifacts(b: *std.Build, config: struct {
     profile: bool = false,
 }) !struct {
     libsupport: Library,
-    libaudio: Library,
+    libai: Library,
+    libdiff: Library,
     libnetwork: Library,
     libservices: Library,
     libui: Library,
@@ -350,7 +351,6 @@ fn addArtifacts(b: *std.Build, config: struct {
     };
     const stb_dep = stb.build(b, dep_config);
     const sokol_dep = sokol.build(b, dep_config);
-    const ma_dep = miniaudio.build(b, dep_config);
     const nanosvg_dep = nanosvg.build(b, dep_config);
 
     var base_lib_config: ArtifactConfig = .{
@@ -367,11 +367,12 @@ fn addArtifacts(b: *std.Build, config: struct {
 
     const libcurl = config.stdx_dep.artifact("curl");
     const libsupport: Library = .init(b, base_lib_config.with("support", .{
-        .link_libraries = &.{ stb_dep.artifact, ma_dep.artifact },
+        .link_libraries = &.{stb_dep.artifact},
     }));
     base_lib_config.libsupport = libsupport.artifact;
 
-    const libaudio: Library = .init(b, base_lib_config.with("audio", .{}));
+    const libai: Library = .init(b, base_lib_config.with("ai", .{}));
+    const libdiff: Library = .init(b, base_lib_config.with("diff", .{}));
     const libnetwork: Library = .init(b, base_lib_config.with("network", .{}));
     const libservices: Library = .init(b, base_lib_config.with("services", .{
         .link_libraries = &.{libcurl},
@@ -385,8 +386,8 @@ fn addArtifacts(b: *std.Build, config: struct {
     }));
 
     const all_pbnj_libraries = [_]*std.Build.Step.Compile{
-        libsupport.artifact,  libaudio.artifact, libnetwork.artifact,
-        libservices.artifact, libui.artifact,
+        libsupport.artifact, libai.artifact,       libdiff.artifact,
+        libnetwork.artifact, libservices.artifact, libui.artifact,
     };
 
     var exe_link_libraries: stdx.ArrayList(*std.Build.Step.Compile) = .fromSlice(b, &all_pbnj_libraries);
@@ -446,8 +447,11 @@ fn addArtifacts(b: *std.Build, config: struct {
 
         var unit_suites: stdx.ArrayList(Test) = .init(b);
         unit_suites.append(.init(b, base_test_config.with("support", .{})));
-        unit_suites.append(.init(b, base_test_config.with("audio", .{
-            .link_libraries = &.{libaudio.artifact},
+        unit_suites.append(.init(b, base_test_config.with("ai", .{
+            .link_libraries = &.{libai.artifact},
+        })));
+        unit_suites.append(.init(b, base_test_config.with("diff", .{
+            .link_libraries = &.{libdiff.artifact},
         })));
         unit_suites.append(.init(b, base_test_config.with("network", .{
             .link_libraries = &.{libnetwork.artifact},
@@ -471,7 +475,8 @@ fn addArtifacts(b: *std.Build, config: struct {
 
     return .{
         .libsupport = libsupport,
-        .libaudio = libaudio,
+        .libai = libai,
+        .libdiff = libdiff,
         .libnetwork = libnetwork,
         .libservices = libservices,
         .libui = libui,

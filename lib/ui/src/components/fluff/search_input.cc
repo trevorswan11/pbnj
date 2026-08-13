@@ -33,7 +33,7 @@ auto search_input::render(context& ctx) -> void {
     const bool changed = ImGui::InputTextWithHint(
         tag.c_str(), placeholder.c_str(), &ctx.search_input, ImGuiInputTextFlags_EnterReturnsTrue);
     if (changed && on_submit) {
-        on_submit(ctx, ctx.search_input); // TODO: Debounce this
+        on_submit(ctx, ctx.search_input);
     } else if (ImGui::IsItemEdited() && on_change) {
         on_change(ctx, ctx.search_input);
     }

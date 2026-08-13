@@ -10,8 +10,7 @@ Diagnostics:
     Suppress: [static_non_static]
     MissingIncludes: Strict
     Includes:
-        IgnoreHeader:
-            - "glm/.*"
+        IgnoreHeader: [".*__chrono/.*", "<chrono>"]
 
 Style:
     QuotedHeaders: ["lib/.*", "tests/.*", "fuzz/.*"]

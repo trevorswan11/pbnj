@@ -5,10 +5,12 @@
 #include <stdx/assert.hh>
 #include <stdx/profiler.hh>
 #include <stdx/utility.hh>
+#include <string_view>
 
 #include "ui/assets/texture_cache.hh"
 #include "ui/core/context.hh"
 #include "ui/pages/home.hh"
+#include "ui/pages/search.hh"
 
 namespace pbnj::ui::components {
 
@@ -36,10 +38,10 @@ top_bar::top_bar()
           .on_click = [](context& ctx) { ctx.router.emplace_page<pages::home>(ctx); },
       }},
       search_{{
-          .tag           = "##search",
-          .icon_id       = assets::core_icon_id_t::SEARCH,
-          .disabled_tint = 1,
-          .is_disabled   = [](const context&) { return true; },
+          .tag       = "##top_search",
+          .width     = 360.0f,
+          .on_change = [](context& ctx,
+                          std::string_view) { ctx.router.emplace_page<pages::search>(ctx); },
       }},
       padded_icon_button_dim_{back_.width() + 2 * back_.frame_padding()} {}
 
@@ -91,6 +93,7 @@ auto top_bar::render(context& ctx) -> void {
     // Home button
     home_.render(ctx);
     ImGui::SameLine();
+    search_.render(ctx);
 }
 
 } // namespace pbnj::ui::components

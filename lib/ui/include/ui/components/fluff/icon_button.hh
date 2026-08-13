@@ -7,8 +7,8 @@
 #include <imgui.h>
 #include <stdx/function.hh>
 #include <stdx/option.hh>
+#include <stdx/types.hh>
 
-#include "stdx/types.hh"
 #include "ui/assets/texture_cache.hh"
 #include "ui/core/component.hh"
 #include "ui/core/context.hh"

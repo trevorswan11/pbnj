@@ -3,9 +3,10 @@
 #include <string>
 #include <string_view>
 
+#include <SDL3/SDL_gpu.h>
 #include <ankerl/unordered_dense.h>
 #include <gsl/span>
-#include <sokol.h>
+#include <imgui.hh>
 #include <stdx/fixed/enum_map.hh>
 #include <stdx/hash.hh>
 #include <stdx/option.hh>
@@ -48,6 +49,13 @@ class texture_cache {
     ~texture_cache() { clear(); };
     MAKE_MOVE_ONLY(texture_cache);
 
+    auto init(SDL_GPUDevice* device, f32 dpi_scale = 1.0f) noexcept -> void {
+        device_    = device;
+        dpi_scale_ = dpi_scale;
+    }
+
+    auto set_dpi_scale(f32 dpi_scale) noexcept -> void { dpi_scale_ = dpi_scale; }
+
     [[nodiscard]] auto get_or_load_svg(std::string_view name, gsl::span<const char> data)
         -> result<ImTextureID>;
     [[nodiscard]] auto get_core_icon(core_icon_id_t id) -> ImTextureID;
@@ -60,14 +68,16 @@ class texture_cache {
     [[nodiscard]] auto ensure_fallback_texture() noexcept -> result<void>;
 
     [[nodiscard]] auto load_svg_internal(gsl::span<const char> data) -> result<texture>;
-    [[nodiscard]] auto create_texture(i32 width, i32 height, gsl::span<const u8> raw_bytes) noexcept
+    [[nodiscard]] auto create_texture(u32 width, u32 height, gsl::span<const u8> raw_bytes) noexcept
         -> result<texture>;
 
   private:
-    stdx::option<sg_sampler> linear_sampler_;
-    string_map_t<texture>    svg_cache_;
-    core_icon_map_t          core_icons_;
-    texture                  fallback_texture_;
+    SDL_GPUDevice*        device_{nullptr};
+    f32                   dpi_scale_{1.0f};
+    SDL_GPUSampler*       linear_sampler_{nullptr};
+    string_map_t<texture> svg_cache_;
+    core_icon_map_t       core_icons_;
+    texture               fallback_texture_;
 };
 
 } // namespace pbnj::ui::assets

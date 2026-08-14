@@ -6,18 +6,25 @@
 #    include <windef.h>
 #endif
 
+#include <SDL3/SDL_properties.h>
+#include <SDL3/SDL_video.h>
 #include <gsl/span>
-#include <sokol.h>
+#include <imgui.hh>
 
 #include "ui/theme/colors.hh"
 
 namespace pbnj::ui::theme {
 
-auto style_manager::apply_dark_mode() noexcept -> void {
+auto style_manager::apply_dark_mode(SDL_Window* window) noexcept -> void {
 #ifdef _WIN32
-    HWND hwnd          = reinterpret_cast<HWND>(const_cast<void*>(sapp_win32_get_hwnd()));
-    BOOL use_dark_mode = TRUE;
-    DwmSetWindowAttribute(hwnd, 20, &use_dark_mode, sizeof(use_dark_mode));
+    if (window) {
+        auto* hwnd = static_cast<HWND>(SDL_GetPointerProperty(
+            SDL_GetWindowProperties(window), SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr));
+        if (hwnd) {
+            BOOL use_dark_mode = TRUE;
+            DwmSetWindowAttribute(hwnd, 20, &use_dark_mode, sizeof(use_dark_mode));
+        }
+    }
 #endif
 
     auto& style             = ImGui::GetStyle();

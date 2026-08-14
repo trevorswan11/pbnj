@@ -1,8 +1,7 @@
 #include "ui/components/fluff/search_input.hh"
 
 #include <gsl/util>
-#include <imgui.h>
-#include <imgui_stdlib.h>
+#include <imgui.hh>
 #include <stdx/profiler.hh>
 #include <stdx/types.hh>
 

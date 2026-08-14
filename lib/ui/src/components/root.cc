@@ -1,6 +1,6 @@
 #include "ui/components/root.hh"
 
-#include <sokol.h>
+#include <imgui.hh>
 #include <stdx/profiler.hh>
 #include <stdx/utility.hh>
 
@@ -24,9 +24,9 @@ auto root::on_unmount(context& ctx) -> void {
 
 auto root::render(context& ctx) -> void {
     PROFILE_FUNCTION();
-    const auto dpi    = sapp_dpi_scale();
-    const auto width  = sapp_widthf() / dpi;
-    const auto height = sapp_heightf() / dpi;
+    const auto display_size = ImGui::GetIO().DisplaySize;
+    const auto width        = display_size.x;
+    const auto height       = display_size.y;
 
     const auto top_h     = 48.0f;
     const auto player_h  = 88.0f;

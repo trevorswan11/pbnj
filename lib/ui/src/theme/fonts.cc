@@ -2,7 +2,7 @@
 
 #include <gsl/pointers>
 #include <gsl/span>
-#include <imgui.h>
+#include <imgui.hh>
 #include <stdx/option.hh>
 #include <stdx/types.hh>
 

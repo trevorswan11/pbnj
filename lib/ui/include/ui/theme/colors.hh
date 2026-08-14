@@ -1,6 +1,7 @@
 #pragma once
 
-#include <sokol.h>
+#include <SDL3/SDL_pixels.h>
+#include <imgui.hh>
 #include <stdx/types.hh>
 
 namespace pbnj::ui::theme::colors {
@@ -28,11 +29,11 @@ constexpr ImVec4 frame_bg_active{0.22f, 0.22f, 0.22f, 1.0f};
 constexpr ImVec4 icon_active{1.0f, 1.0f, 1.0f, 1.0f};
 constexpr ImVec4 icon_idle{0.71f, 0.71f, 0.71f, 0.78f};
 
-[[nodiscard]] constexpr auto as_sokol_color(ImVec4 vec) noexcept -> sg_color {
+[[nodiscard]] constexpr auto as_sdl_color(ImVec4 vec) noexcept -> SDL_FColor {
     return {vec.x, vec.y, vec.z, vec.w};
 }
 
-[[nodiscard]] constexpr auto as_imgui_color(sg_color col) noexcept -> ImVec4 {
+[[nodiscard]] constexpr auto as_imgui_color(SDL_FColor col) noexcept -> ImVec4 {
     return {col.r, col.g, col.b, col.a};
 }
 

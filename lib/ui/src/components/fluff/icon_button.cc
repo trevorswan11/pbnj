@@ -1,7 +1,7 @@
 #include "ui/components/fluff/icon_button.hh"
 
 #include <gsl/util>
-#include <imgui.h>
+#include <imgui.hh>
 #include <stdx/profiler.hh>
 
 #include "ui/core/context.hh"

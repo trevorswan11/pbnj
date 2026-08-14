@@ -1,7 +1,7 @@
 #include "ui/components/top_bar.hh"
 
 #include <gsl/util>
-#include <imgui.h>
+#include <imgui.hh>
 #include <stdx/assert.hh>
 #include <stdx/profiler.hh>
 #include <stdx/utility.hh>

@@ -1,6 +1,6 @@
 #include "ui/pages/search.hh"
 
-#include <imgui.h>
+#include <imgui.hh>
 #include <stdx/profiler.hh>
 #include <stdx/utility.hh>
 

@@ -8,9 +8,9 @@
             .url = "https://github.com/trevorswan11/stdx/archive/refs/tags/v2.6.1.tar.gz",
             .hash = "stdx-2.6.1-dNitg3cHCQCvbp8XMcU5vUXy4NR_Giu30PYx7uqqmf95",
         },
-        .sokol = .{
-            .url = "https://github.com/floooh/sokol/archive/6c283ecc698d583f1e8b6f85388c6b55b4bbe0cc.tar.gz",
-            .hash = "N-V-__8AAKOfaADmYKchxzwva_7bGvawPDwAXN79_Q6UYx-A",
+        .sdl = .{
+            .url = "https://github.com/allyourcodebase/SDL/archive/refs/tags/1.0.1+3.4.14.tar.gz",
+            .hash = "sdl-1.0.1+3.4.14-i4QD0ViwqQAThHDlng1K46lINQ5PioLIz9bDKpGJTuzs",
         },
         .imgui = .{
             .url = "https://github.com/ocornut/imgui/archive/refs/tags/v1.92.9b.tar.gz",

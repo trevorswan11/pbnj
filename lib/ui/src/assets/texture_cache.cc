@@ -1,15 +1,17 @@
 #include "ui/assets/texture_cache.hh"
 
 #include <array>
+#include <cstring>
 #include <string>
 #include <string_view>
 #include <utility>
 
+#include <SDL3/SDL_gpu.h>
 #include <gsl/span>
 #include <gsl/util>
+#include <imgui.hh>
 #include <nanosvg.h>
 #include <nanosvgrast.h>
-#include <sokol.h>
 #include <stdx/assert.hh>
 #include <stdx/memory.hh>
 #include <stdx/option.hh>
@@ -75,10 +77,14 @@ auto texture_cache::fallback_texture() noexcept -> ImTextureID {
 }
 
 auto texture_cache::clear() noexcept -> void {
-    if (sg_isvalid() && linear_sampler_) { sg_destroy_sampler(linear_sampler_.take()); }
+    if (device_ && linear_sampler_) {
+        SDL_ReleaseGPUSampler(device_, linear_sampler_);
+        linear_sampler_ = nullptr;
+    }
     svg_cache_.clear();
     for (auto& core_icon : core_icons_) { core_icon.reset(); }
-    fallback_texture_ = {};
+    fallback_texture_.release();
+    device_ = nullptr;
 }
 
 auto texture_cache::ensure_fallback_texture() noexcept -> result<void> {
@@ -88,16 +94,18 @@ auto texture_cache::ensure_fallback_texture() noexcept -> result<void> {
 }
 
 auto texture_cache::ensure_sampler() noexcept -> result<void> {
-    if (!sg_isvalid()) { return stdx::err{error::SOKOL_SAMPLER_CREATE_FAILED}; }
+    if (!device_) { return stdx::err{error::GPU_DEVICE_NOT_FOUND}; }
     if (!linear_sampler_) {
-        sg_sampler_desc desc{};
-        desc.min_filter = SG_FILTER_LINEAR;
-        desc.mag_filter = SG_FILTER_LINEAR;
-        desc.wrap_u     = SG_WRAP_CLAMP_TO_EDGE;
-        desc.wrap_v     = SG_WRAP_CLAMP_TO_EDGE;
+        SDL_GPUSamplerCreateInfo sampler_info{};
+        sampler_info.min_filter     = SDL_GPU_FILTER_LINEAR;
+        sampler_info.mag_filter     = SDL_GPU_FILTER_LINEAR;
+        sampler_info.mipmap_mode    = SDL_GPU_SAMPLERMIPMAPMODE_LINEAR;
+        sampler_info.address_mode_u = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE;
+        sampler_info.address_mode_v = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE;
+        sampler_info.address_mode_w = SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE;
 
-        stdx::option<sg_sampler> smp = sg_make_sampler(desc);
-        if (!smp) { return stdx::err{error::SOKOL_SAMPLER_CREATE_FAILED}; }
+        auto* smp = SDL_CreateGPUSampler(device_, &sampler_info);
+        if (!smp) { return stdx::err{error::GPU_SAMPLER_CREATE_FAILED}; }
         linear_sampler_ = smp;
     }
     return {};
@@ -109,16 +117,15 @@ auto texture_cache::load_svg_internal(gsl::span<const char> data) -> result<text
     if (!svg) { return stdx::err{error::SVG_PARSE_FAILED}; }
     const auto svg_delete = gsl::finally([svg] { nsvgDelete(svg); });
 
-    const auto dpi_scale  = sapp_dpi_scale();
-    const auto render_w   = static_cast<i32>(svg->width * dpi_scale);
-    const auto render_h   = static_cast<i32>(svg->height * dpi_scale);
+    const auto render_w   = static_cast<i32>(svg->width * dpi_scale_);
+    const auto render_h   = static_cast<i32>(svg->height * dpi_scale_);
     const auto image_size = static_cast<usize>(render_w * render_h * 4);
     auto       pixels     = stdx::make_box<u8[]>(image_size);
 
     auto* rast = nsvgCreateRasterizer();
     if (!rast) { return stdx::err{error::SVG_PARSE_FAILED}; }
     const auto rast_delete = gsl::finally([rast] { nsvgDeleteRasterizer(rast); });
-    nsvgRasterize(rast, svg, 0, 0, dpi_scale, pixels.get(), render_w, render_h, render_w * 4);
+    nsvgRasterize(rast, svg, 0, 0, dpi_scale_, pixels.get(), render_w, render_h, render_w * 4);
 
     for (usize i = 0; i < image_size; i += 4) {
         pixels[i + 0] = 255;
@@ -126,31 +133,78 @@ auto texture_cache::load_svg_internal(gsl::span<const char> data) -> result<text
         pixels[i + 2] = 255;
     }
 
-    return create_texture(render_w, render_h, gsl::span{pixels.get(), image_size});
+    return create_texture(static_cast<u32>(render_w),
+                          static_cast<u32>(render_h),
+                          gsl::span{pixels.get(), image_size});
 }
 
-auto texture_cache::create_texture(i32 width, i32 height, gsl::span<const u8> raw_bytes) noexcept
+auto texture_cache::create_texture(u32 width, u32 height, gsl::span<const u8> raw_bytes) noexcept
     -> result<texture> {
-    sg_image_desc img_desc{};
-    img_desc.width                   = width;
-    img_desc.height                  = height;
-    img_desc.pixel_format            = SG_PIXELFORMAT_RGBA8;
-    img_desc.num_mipmaps             = 1;
-    img_desc.data.mip_levels[0].ptr  = raw_bytes.data();
-    img_desc.data.mip_levels[0].size = raw_bytes.size();
+    if (!device_) { return stdx::err{error::GPU_DEVICE_NOT_FOUND}; }
 
-    texture tex;
-    tex.image = sg_make_image(img_desc);
-    if (!tex.image) { return stdx::err{error::SOKOL_IMG_ALLOC_FAILED}; }
+    SDL_GPUTextureCreateInfo texture_info{};
+    texture_info.type                 = SDL_GPU_TEXTURETYPE_2D;
+    texture_info.format               = SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM;
+    texture_info.usage                = SDL_GPU_TEXTUREUSAGE_SAMPLER;
+    texture_info.width                = width;
+    texture_info.height               = height;
+    texture_info.layer_count_or_depth = 1;
+    texture_info.num_levels           = 1;
 
-    sg_view_desc view_desc{};
-    view_desc.texture.image = *tex.image;
-    tex.view                = sg_make_view(view_desc);
-    if (!tex.view) { return stdx::err{error::SOKOL_IMG_VIEW_ALLOC_FAILED}; }
+    auto* gpu_tex = SDL_CreateGPUTexture(device_, &texture_info);
+    if (!gpu_tex) { return stdx::err{error::GPU_TEXTURE_ALLOC_FAILED}; }
+
+    SDL_GPUTransferBufferCreateInfo transfer_info{};
+    transfer_info.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
+    transfer_info.size  = static_cast<u32>(raw_bytes.size());
+
+    auto* transfer_buf = SDL_CreateGPUTransferBuffer(device_, &transfer_info);
+    if (!transfer_buf) {
+        SDL_ReleaseGPUTexture(device_, gpu_tex);
+        return stdx::err{error::GPU_TRANSFER_BUFFER_FAILED};
+    }
+    const auto cleanup_transfer =
+        gsl::finally([this, transfer_buf] { SDL_ReleaseGPUTransferBuffer(device_, transfer_buf); });
+
+    auto* map_ptr = SDL_MapGPUTransferBuffer(device_, transfer_buf, false);
+    if (!map_ptr) {
+        SDL_ReleaseGPUTexture(device_, gpu_tex);
+        return stdx::err{error::GPU_TRANSFER_BUFFER_FAILED};
+    }
+    std::memcpy(map_ptr, raw_bytes.data(), raw_bytes.size());
+    SDL_UnmapGPUTransferBuffer(device_, transfer_buf);
+
+    auto* cmd = SDL_AcquireGPUCommandBuffer(device_);
+    if (!cmd) {
+        SDL_ReleaseGPUTexture(device_, gpu_tex);
+        return stdx::err{error::GPU_TRANSFER_BUFFER_FAILED};
+    }
+
+    {
+        auto*      copy_pass = SDL_BeginGPUCopyPass(cmd);
+        const auto end_pass  = gsl::finally([copy_pass] { SDL_EndGPUCopyPass(copy_pass); });
+        SDL_GPUTextureTransferInfo src_info{};
+        src_info.transfer_buffer = transfer_buf;
+        src_info.offset          = 0;
+        src_info.pixels_per_row  = static_cast<u32>(width);
+        src_info.rows_per_layer  = static_cast<u32>(height);
+
+        SDL_GPUTextureRegion dst_region{};
+        dst_region.texture = gpu_tex;
+        dst_region.w       = static_cast<u32>(width);
+        dst_region.h       = static_cast<u32>(height);
+        dst_region.d       = 1;
+
+        SDL_UploadToGPUTexture(copy_pass, &src_info, &dst_region, false);
+    }
+    SDL_SubmitGPUCommandBuffer(cmd);
 
     TRY(ensure_sampler());
-    tex.imgui_id = simgui_imtextureid_with_sampler(*tex.view, *linear_sampler_);
-    if (!tex.imgui_id) { return stdx::err{error::INVALID_IMGUI_TEXTURE}; }
+    texture tex;
+    tex.device   = device_;
+    tex.handle   = gpu_tex;
+    tex.sampler  = linear_sampler_;
+    tex.imgui_id = reinterpret_cast<ImTextureID>(gpu_tex);
 
     return tex;
 }

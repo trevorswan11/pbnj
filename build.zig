@@ -3,7 +3,7 @@ const zon = @import("build.zig.zon");
 pub const stdx = @import("stdx");
 
 const stb = @import("third-party/stb.zig");
-const sokol = @import("third-party/sokol.zig");
+const sdl = @import("third-party/sdl.zig");
 const nanosvg = @import("third-party/nanosvg.zig");
 
 pub fn build(b: *std.Build) !void {
@@ -350,7 +350,7 @@ fn addArtifacts(b: *std.Build, config: struct {
         .target = target,
     };
     const stb_dep = stb.build(b, dep_config);
-    const sokol_dep = sokol.build(b, dep_config);
+    const sdl_dep = sdl.build(b, dep_config);
     const nanosvg_dep = nanosvg.build(b, dep_config);
 
     var base_lib_config: ArtifactConfig = .{
@@ -379,7 +379,7 @@ fn addArtifacts(b: *std.Build, config: struct {
     }));
     const libui: Library = .init(b, base_lib_config.with("ui", .{
         .link_libraries = &.{
-            sokol_dep.artifact,
+            sdl_dep.artifact,
             stb_dep.artifact,
             nanosvg_dep.artifact,
         },

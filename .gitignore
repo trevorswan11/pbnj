@@ -70,3 +70,7 @@ zig-pkg/
 Testing/
 .cache/
 .zig-cache
+
+# ImGui settings
+imgui.ini
+*.ini

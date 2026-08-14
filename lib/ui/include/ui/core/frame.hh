@@ -1,6 +1,8 @@
 #pragma once
 
-#include <imgui.h>
+#include <SDL3/SDL_gpu.h>
+#include <SDL3/SDL_video.h>
+#include <imgui.hh>
 #include <stdx/types.hh>
 #include <stdx/utility.hh>
 
@@ -10,18 +12,20 @@ namespace pbnj::ui {
 
 class frame {
   public:
-    explicit frame(ImVec4 clear_color = theme::colors::dark_grey) noexcept;
+    explicit frame(SDL_Window*    window,
+                   SDL_GPUDevice* device,
+                   f64            dt,
+                   ImVec4         clear_color = theme::colors::dark_grey) noexcept;
     ~frame();
     MAKE_PINNED(frame);
 
     MAKE_GETTER(dt, f64)
 
   private:
-    i32    width_;
-    i32    height_;
-    f64    dt_;
-    f32    dpi_scale_;
-    ImVec4 clear_color_;
+    SDL_Window*    window_;
+    SDL_GPUDevice* device_;
+    f64            dt_;
+    ImVec4         clear_color_;
 };
 
 } // namespace pbnj::ui

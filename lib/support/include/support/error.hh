@@ -12,6 +12,10 @@ enum class error : u8 {
     GPU_TRANSFER_BUFFER_FAILED,
     GPU_SAMPLER_CREATE_FAILED,
     INVALID_IMGUI_TEXTURE,
+    CONFIG_FILE_NOT_FOUND,
+    CONFIG_PARSE_FAILED,
+    CONFIG_WRITE_FAILED,
+    CONFIG_DIRECTORY_CREATE_FAILED,
 };
 
 template <typename T> using result = stdx::result<T, error>;

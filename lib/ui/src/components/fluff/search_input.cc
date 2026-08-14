@@ -6,7 +6,6 @@
 #include <stdx/types.hh>
 
 #include "ui/core/context.hh"
-#include "ui/theme/colors.hh"
 
 namespace pbnj::ui::components {
 
@@ -23,9 +22,10 @@ auto search_input::render(context& ctx) -> void {
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 100.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {text_pad_left, 6.0f});
     const auto style_cleanup = gsl::finally([] { ImGui::PopStyleVar(2); });
-    ImGui::PushStyleColor(ImGuiCol_FrameBg, theme::colors::frame_bg);
-    ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, theme::colors::frame_bg_hovered);
-    ImGui::PushStyleColor(ImGuiCol_FrameBgActive, theme::colors::frame_bg_active);
+
+    ImGui::PushStyleColor(ImGuiCol_FrameBg, ctx.styles.frame_bg());
+    ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ctx.styles.frame_bg_hovered());
+    ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ctx.styles.frame_bg_active());
     const auto color_cleanup = gsl::finally([] { ImGui::PopStyleColor(3); });
 
     ImGui::SetNextItemWidth(width);
@@ -45,7 +45,7 @@ auto search_input::render(context& ctx) -> void {
     const auto search_tex = ctx.textures.get_core_icon(icon_id);
 
     const ImColor icon_col =
-        ImGui::IsItemActive() ? theme::colors::icon_active : theme::colors::icon_idle;
+        ImGui::IsItemActive() ? ctx.styles.icon_active() : ctx.styles.icon_idle();
     ImGui::GetWindowDrawList()->AddImage(search_tex,
                                          {icon_x, icon_y},
                                          {icon_x + icon_size, icon_y + icon_size},

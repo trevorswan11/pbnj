@@ -6,16 +6,11 @@
 #include <stdx/types.hh>
 #include <stdx/utility.hh>
 
-#include "ui/theme/colors.hh"
-
 namespace pbnj::ui {
 
 class frame {
   public:
-    explicit frame(SDL_Window*    window,
-                   SDL_GPUDevice* device,
-                   f64            dt,
-                   ImVec4         clear_color = theme::colors::dark_grey) noexcept;
+    explicit frame(SDL_Window* window, SDL_GPUDevice* device, f64 dt, ImVec4 clear_color) noexcept;
     ~frame();
     MAKE_PINNED(frame);
 

@@ -5,7 +5,7 @@
 #include <imgui.hh>
 #include <stdx/types.hh>
 
-#include "ui/theme/colors.hh"
+#include "ui/theme/style.hh"
 
 namespace pbnj::ui {
 
@@ -31,7 +31,7 @@ frame::~frame() {
         swapchain_tex) {
         SDL_GPUColorTargetInfo color_target{};
         color_target.texture     = swapchain_tex;
-        color_target.clear_color = theme::colors::as_sdl_color(clear_color_);
+        color_target.clear_color = theme::as_sdl_color(clear_color_);
         color_target.load_op     = SDL_GPU_LOADOP_CLEAR;
         color_target.store_op    = SDL_GPU_STOREOP_STORE;
 

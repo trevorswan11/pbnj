@@ -65,6 +65,7 @@ zig-pkg/
 
 # debug information files
 *.dwo
+PR-review-notes.md
 
 # test output & cache
 Testing/
@@ -73,4 +74,4 @@ Testing/
 
 # ImGui settings
 imgui.ini
-*.ini
+*.ini

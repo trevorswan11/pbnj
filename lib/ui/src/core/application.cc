@@ -25,6 +25,7 @@
 #include "ui/core/context.hh"
 #include "ui/core/frame.hh"
 #include "ui/pages/home.hh"
+#include "ui/theme/style.hh"
 
 namespace pbnj::ui {
 
@@ -140,7 +141,7 @@ auto application::impl::on_init() noexcept -> bool {
     current_dpi_ = SDL_GetWindowDisplayScale(window_);
     ctx_.fonts.init(current_dpi_);
     ctx_.log.info("Initialized font manager");
-    ctx_.styles.apply_dark_mode(window_);
+    ctx_.styles.set_mode(window_, theme::mode_t::DARK);
     ctx_.log.info("Applied application-wide dark mode");
     ctx_.textures.init(gpu_device_, current_dpi_);
 
@@ -163,7 +164,7 @@ auto application::impl::on_frame(f64 dt) noexcept -> void {
     PROFILE_FUNCTION();
     if (!is_initialized_) { return; }
 
-    const ui::frame frame{window_, gpu_device_, dt};
+    const ui::frame frame{window_, gpu_device_, dt, ctx_.styles.clear_color()};
 
     ctx_.router.update_current(ctx_, dt);
     root_.render(ctx_);

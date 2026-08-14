@@ -10,6 +10,7 @@
 #include <SDL3/SDL_video.h>
 #include <gsl/span>
 #include <imgui.hh>
+#include <stdx/utility.hh>
 
 namespace pbnj::ui::theme {
 
@@ -76,10 +77,13 @@ constexpr ImVec4 icon_idle_light{0.35f, 0.35f, 0.38f, 0.85f};
 // cppcheck-suppress-begin [unreadVariable, constParameterReference, constParameterPointer]
 namespace {
 
-auto set_win32_header_mode(SDL_Window* window, BOOL use_dark_mode) -> void {
+auto set_window_mode(SDL_Window* window, mode_t mode) -> void {
+    DISCARD(window);
+    DISCARD(mode);
 #ifdef _WIN32
     if (window) {
-        auto* hwnd = static_cast<HWND>(SDL_GetPointerProperty(
+        BOOL  use_dark_mode = mode == mode_t::DARK;
+        auto* hwnd          = static_cast<HWND>(SDL_GetPointerProperty(
             SDL_GetWindowProperties(window), SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr));
         if (hwnd) { DwmSetWindowAttribute(hwnd, 20, &use_dark_mode, sizeof(use_dark_mode)); }
     }
@@ -87,9 +91,7 @@ auto set_win32_header_mode(SDL_Window* window, BOOL use_dark_mode) -> void {
 }
 
 auto apply_dark_mode(SDL_Window* window, ImGuiStyle& style) noexcept -> void {
-#ifdef _WIN32
-    set_win32_header_mode(window, TRUE);
-#endif
+    set_window_mode(window, mode_t::DARK);
 
     gsl::span style_colors                      = style.Colors;
     style_colors[ImGuiCol_Text]                 = colors::dark_text;
@@ -141,9 +143,7 @@ auto apply_dark_mode(SDL_Window* window, ImGuiStyle& style) noexcept -> void {
 }
 
 auto apply_light_mode(SDL_Window* window, ImGuiStyle& style) noexcept -> void {
-#ifdef _WIN32
-    set_win32_header_mode(window, FALSE);
-#endif
+    set_window_mode(window, mode_t::LIGHT);
 
     gsl::span style_colors                      = style.Colors;
     style_colors[ImGuiCol_Text]                 = colors::light_text;

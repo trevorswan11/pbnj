@@ -1,9 +1,9 @@
 #pragma once
 
+#include <gsl/pointers>
 #include <string>
 #include <string_view>
 
-#include <SDL3/SDL_gpu.h>
 #include <ankerl/unordered_dense.h>
 #include <gsl/span>
 #include <imgui.hh>
@@ -12,12 +12,17 @@
 #include <stdx/option.hh>
 #include <stdx/types.hh>
 #include <stdx/utility.hh>
+#include <vulkan/vulkan_core.h>
 
 #include "support/error.hh"
 #include "ui/assets/texture.hh"
 #include "ui/core/compact_types.hh" // IWYU pragma: keep
 
-namespace pbnj::ui::assets {
+namespace pbnj::ui {
+
+class vk_context;
+
+namespace assets {
 
 enum class core_icon_id_t : u8 {
     CHEVRON_LEFT,  // Navbar back button
@@ -49,11 +54,7 @@ class texture_cache {
     ~texture_cache() { clear(); };
     MAKE_MOVE_ONLY(texture_cache);
 
-    auto init(SDL_GPUDevice* device, f32 dpi_scale = 1.0f) noexcept -> void {
-        device_    = device;
-        dpi_scale_ = dpi_scale;
-    }
-
+    auto init(gsl::not_null<vk_context*> vk_ctx, f32 dpi_scale = 1.0f) noexcept -> void;
     auto set_dpi_scale(f32 dpi_scale) noexcept -> void { dpi_scale_ = dpi_scale; }
 
     [[nodiscard]] auto get_or_load_svg(std::string_view name, gsl::span<const char> data)
@@ -72,12 +73,14 @@ class texture_cache {
         -> result<texture>;
 
   private:
-    SDL_GPUDevice*        device_{nullptr};
-    f32                   dpi_scale_{1.0f};
-    SDL_GPUSampler*       linear_sampler_{nullptr};
-    string_map_t<texture> svg_cache_;
-    core_icon_map_t       core_icons_;
-    texture               fallback_texture_;
+    stdx::option<vk_context&> vk_ctx_;
+    f32                       dpi_scale_{1.0f};
+    stdx::option<VkSampler>   linear_sampler_;
+    string_map_t<texture>     svg_cache_;
+    core_icon_map_t           core_icons_;
+    texture                   fallback_texture_;
 };
 
-} // namespace pbnj::ui::assets
+} // namespace assets
+
+} // namespace pbnj::ui

@@ -1,9 +1,10 @@
 #pragma once
 
-#include <SDL3/SDL_gpu.h>
 #include <imgui.hh>
 #include <stdx/option.hh>
 #include <stdx/utility.hh>
+#include <vk_mem_alloc.h>
+#include <vulkan/vulkan_core.h>
 
 #include "ui/core/compact_types.hh" // IWYU pragma: keep
 
@@ -17,32 +18,44 @@ struct texture {
     auto operator=(const texture&) -> texture& = delete;
 
     texture(texture&& other) noexcept
-        : device{std::exchange(other.device, nullptr)},
-          handle{std::exchange(other.handle, nullptr)},
-          sampler{std::exchange(other.sampler, nullptr)}, imgui_id{other.imgui_id.take()} {}
+        : device{other.device.take()}, allocator{other.allocator.take()}, image{other.image.take()},
+          allocation{other.allocation.take()}, view{other.view.take()},
+          sampler{other.sampler.take()}, descriptor_set{other.descriptor_set.take()},
+          imgui_id{other.imgui_id.take()} {}
 
     auto operator=(texture&& other) noexcept -> texture& {
         if (this != &other) {
             release();
-            device   = std::exchange(other.device, nullptr);
-            handle   = std::exchange(other.handle, nullptr);
-            sampler  = std::exchange(other.sampler, nullptr);
-            imgui_id = other.imgui_id.take();
+            device         = other.device.take();
+            allocator      = other.allocator.take();
+            image          = other.image.take();
+            allocation     = other.allocation.take();
+            view           = other.view.take();
+            sampler        = other.sampler.take();
+            descriptor_set = other.descriptor_set.take();
+            imgui_id       = other.imgui_id.take();
         }
         return *this;
     }
 
     auto release() noexcept -> void {
-        if (device && handle) { SDL_ReleaseGPUTexture(device, std::exchange(handle, nullptr)); }
-        sampler = nullptr;
+        if (descriptor_set) { ImGui_ImplVulkan_RemoveTexture(descriptor_set.take()); }
+        if (device && view) { vkDestroyImageView(*device, view.take(), nullptr); }
+        if (allocator && image) { vmaDestroyImage(*allocator, image.take(), allocation.take()); }
+        sampler.reset();
+        device.reset();
+        allocator.reset();
         imgui_id.reset();
-        device = nullptr;
     }
 
-    SDL_GPUDevice*            device{nullptr};
-    SDL_GPUTexture*           handle{nullptr};
-    SDL_GPUSampler*           sampler{nullptr};
-    stdx::option<ImTextureID> imgui_id;
+    stdx::option<VkDevice>        device;
+    stdx::option<VmaAllocator>    allocator;
+    stdx::option<VkImage>         image;
+    stdx::option<VmaAllocation>   allocation;
+    stdx::option<VkImageView>     view;
+    stdx::option<VkSampler>       sampler;
+    stdx::option<VkDescriptorSet> descriptor_set;
+    stdx::option<ImTextureID>     imgui_id;
 };
 
 } // namespace pbnj::ui::assets

@@ -1,13 +1,18 @@
 #include "ui/theme/style.hh"
 
-#ifdef _WIN32
+#include <pbnj/config.h>
+#if PBNJ_WINDOWS
 #    include <dwmapi.h>
 #    include <minwindef.h>
 #    include <windef.h>
+#    define GLFW_EXPOSE_NATIVE_WIN32
 #endif
 
-#include <SDL3/SDL_properties.h>
-#include <SDL3/SDL_video.h>
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
+#if PBNJ_WINDOWS
+#    include <GLFW/glfw3native.h>
+#endif
 #include <gsl/span>
 #include <imgui.hh>
 #include <stdx/utility.hh>
@@ -77,20 +82,19 @@ constexpr ImVec4 icon_idle_light{0.35f, 0.35f, 0.38f, 0.85f};
 // cppcheck-suppress-begin [unreadVariable, constParameterReference, constParameterPointer]
 namespace {
 
-auto set_window_mode(SDL_Window* window, mode_t mode) -> void {
+auto set_window_mode(GLFWwindow* window, mode_t mode) -> void {
     DISCARD(window);
     DISCARD(mode);
-#ifdef _WIN32
+#if PBNJ_WINDOWS
     if (window) {
-        BOOL  use_dark_mode = mode == mode_t::DARK;
-        auto* hwnd          = static_cast<HWND>(SDL_GetPointerProperty(
-            SDL_GetWindowProperties(window), SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr));
+        BOOL use_dark_mode = mode == mode_t::DARK;
+        HWND hwnd          = glfwGetWin32Window(window);
         if (hwnd) { DwmSetWindowAttribute(hwnd, 20, &use_dark_mode, sizeof(use_dark_mode)); }
     }
 #endif
 }
 
-auto apply_dark_mode(SDL_Window* window, ImGuiStyle& style) noexcept -> void {
+auto apply_dark_mode(GLFWwindow* window, ImGuiStyle& style) noexcept -> void {
     set_window_mode(window, mode_t::DARK);
 
     gsl::span style_colors                      = style.Colors;
@@ -142,7 +146,7 @@ auto apply_dark_mode(SDL_Window* window, ImGuiStyle& style) noexcept -> void {
     style_colors[ImGuiCol_InputTextCursor]      = colors::white;
 }
 
-auto apply_light_mode(SDL_Window* window, ImGuiStyle& style) noexcept -> void {
+auto apply_light_mode(GLFWwindow* window, ImGuiStyle& style) noexcept -> void {
     set_window_mode(window, mode_t::LIGHT);
 
     gsl::span style_colors                      = style.Colors;
@@ -197,7 +201,7 @@ auto apply_light_mode(SDL_Window* window, ImGuiStyle& style) noexcept -> void {
 } // namespace
 // cppcheck-suppress-end [unreadVariable, constParameterReference, constParameterPointer]
 
-auto style_manager::set_mode(SDL_Window* window, mode_t mode) noexcept -> void {
+auto style_manager::set_mode(GLFWwindow* window, mode_t mode) noexcept -> void {
     auto& style             = ImGui::GetStyle();
     style.WindowRounding    = 0;
     style.ChildRounding     = 8;

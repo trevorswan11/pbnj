@@ -34,6 +34,8 @@ class search_input : public component, private search_input_props {
     auto on_mount(context& ctx) -> void override;
     auto on_unmount(context& ctx) -> void override;
     auto render(context& ctx) -> void override;
+
+    auto set_width(f32 w) noexcept -> void { width = w; }
 };
 
 } // namespace pbnj::ui::components

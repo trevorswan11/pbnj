@@ -3,25 +3,37 @@ const zon = @import("build.zig.zon");
 pub const stdx = @import("stdx");
 
 const stb = @import("third-party/stb.zig");
-const sdl = @import("third-party/sdl.zig");
+const glfw = @import("third-party/glfw.zig");
+const vulkan = @import("third-party/vulkan.zig");
 const nanosvg = @import("third-party/nanosvg.zig");
 
 pub fn build(b: *std.Build) !void {
+    const target = b.graph.host;
     const optimize = b.standardOptimizeOption(.{
         .preferred_optimize_mode = .ReleaseFast,
     });
 
     const profile = b.option(bool, "profile", "Enable chromium tracing") orelse false;
     const stdx_dep = b.dependency("stdx", .{
-        .target = b.graph.host,
+        .target = target,
         .optimize = optimize,
         .profile = profile,
         .building_for_dep = true,
         .run_cdb_gen = false,
+        .xcode_frameworks_path = if (target.result.os.tag.isDarwin()) blk: {
+            if (b.lazyDependency("xcode_frameworks", .{})) |dep| {
+                break :blk dep.path(".").getPath(b);
+            } else break :blk null;
+        } else null,
     });
 
     var compiler_flags: stdx.ArrayList([]const u8) = .fromSlice(b, &stdx.utils.base_cxx_flags);
-    compiler_flags.appendSlice(&.{ "-DMAGIC_ENUM_RANGE_MAX=255", "-DSPDLOG_COMPILED_LIB" });
+    compiler_flags.appendSlice(&.{
+        "-DMAGIC_ENUM_RANGE_MAX=255",
+        "-DSPDLOG_COMPILED_LIB",
+        "-Wno-nullability-completeness",
+        "-Wno-nullability-extension",
+    });
     const dist_flags: []const []const u8 = &.{ "-DNDEBUG", "-DPBNJ_DIST" };
 
     var package_flags = compiler_flags.clone();
@@ -213,7 +225,7 @@ const Library = struct {
                 .link_libraries = link_libraries.wrapped.items,
             }),
         });
-        stdx.Dependency.addFrameworkSearchPaths(lib.root_module, config.target);
+        stdx.addFrameworkSearchPaths(lib.root_module, config.target);
         lib.installHeadersDirectory(include_path, "", .{ .include_extensions = &.{".hh"} });
         if (config.cdb_steps) |cdb_steps| cdb_steps.append(&lib.step);
         if (config.auto_install) b.installArtifact(lib);
@@ -276,7 +288,7 @@ const Test = struct {
                 },
             },
         });
-        stdx.Dependency.addFrameworkSearchPaths(test_artifact.root_module, config.target);
+        stdx.addFrameworkSearchPaths(test_artifact.root_module, config.target);
         if (config.cdb_steps) |cdb| cdb.append(&test_artifact.step);
 
         return .{
@@ -350,7 +362,8 @@ fn addArtifacts(b: *std.Build, config: struct {
         .target = target,
     };
     const stb_dep = stb.build(b, dep_config);
-    const sdl_dep = sdl.build(b, dep_config);
+    const glfw_dep = glfw.build(b, dep_config);
+    const vulkan_dep = vulkan.build(b, glfw_dep, dep_config);
     const nanosvg_dep = nanosvg.build(b, dep_config);
 
     var base_lib_config: ArtifactConfig = .{
@@ -379,7 +392,8 @@ fn addArtifacts(b: *std.Build, config: struct {
     }));
     const libui: Library = .init(b, base_lib_config.with("ui", .{
         .link_libraries = &.{
-            sdl_dep.artifact,
+            glfw_dep.artifact,
+            vulkan_dep.artifact,
             stb_dep.artifact,
             nanosvg_dep.artifact,
         },
@@ -410,7 +424,7 @@ fn addArtifacts(b: *std.Build, config: struct {
             },
         },
     });
-    stdx.Dependency.addFrameworkSearchPaths(pbnj.root_module, target);
+    stdx.addFrameworkSearchPaths(pbnj.root_module, target);
     if (config.auto_install) b.installArtifact(pbnj);
     if (config.cdb_steps) |cdb_steps| cdb_steps.append(&pbnj.step);
 

@@ -30,6 +30,7 @@ class font_manager {
   private:
     [[nodiscard]] auto add_font(gsl::span<unsigned char> raw_ttf,
                                 f32                      font_size,
+                                f32                      dpi_scale,
                                 const ImFontConfig&      cfg) noexcept -> gsl::not_null<ImFont*>;
 
   private:

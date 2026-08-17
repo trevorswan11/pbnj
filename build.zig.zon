@@ -5,12 +5,39 @@
     .minimum_zig_version = "0.16.0",
     .dependencies = .{
         .stdx = .{
-            .url = "https://github.com/trevorswan11/stdx/archive/refs/tags/v2.6.1.tar.gz",
-            .hash = "stdx-2.6.1-dNitg3cHCQCvbp8XMcU5vUXy4NR_Giu30PYx7uqqmf95",
+            .url = "https://github.com/trevorswan11/stdx/archive/refs/tags/v2.6.3.tar.gz",
+            .hash = "stdx-2.6.3-dNitgykLCQBkH8BlvITajQfHYI51HXKnM2Mbb0KiVi7a",
         },
-        .sdl = .{
-            .url = "https://github.com/allyourcodebase/SDL/archive/refs/tags/1.0.1+3.4.14.tar.gz",
-            .hash = "sdl-1.0.1+3.4.14-i4QD0ViwqQAThHDlng1K46lINQ5PioLIz9bDKpGJTuzs",
+        .glfw = .{
+            .url = "https://github.com/glfw/glfw/archive/refs/tags/3.5.1.tar.gz",
+            .hash = "N-V-__8AAFAoSgCaIXvRyU85vZ0bKDcZLaUHWrojNKxEio2r",
+        },
+        .vulkan_headers = .{
+            .url = "https://github.com/KhronosGroup/Vulkan-Headers/archive/refs/tags/v1.4.357.tar.gz",
+            .hash = "N-V-__8AAO2WewIbm0OeFBxoD5LxmEzZigF1yXmgGLuahMD5",
+        },
+        .volk = .{
+            .url = "https://github.com/zeux/volk/archive/refs/tags/1.4.350.tar.gz",
+            .hash = "N-V-__8AAFGqCADosOofL302vYn3DZNlkeErvJevsqMt-Jpa",
+        },
+        .vma = .{
+            .url = "https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator/archive/refs/tags/v3.4.0.tar.gz",
+            .hash = "N-V-__8AAG7MQQCXcvOh0VkmSXF9qW5CTbgporOoN7XDgeov",
+        },
+        .xcode_frameworks = .{
+            .url = "https://github.com/trevorswan11/xcode-frameworks/archive/refs/tags/v26.1.tar.gz",
+            .hash = "N-V-__8AAM3wGwwkEHFbzMClo84pWjSBd0xNRM0TC2-TbraN",
+            .lazy = true,
+        },
+        .wayland_headers = .{
+            .url = "https://github.com/allyourcodebase/wayland-headers/archive/1bcb1200b5fa17ef9ff603f66817e72c170342c1.zip",
+            .hash = "N-V-__8AAAVvCwDLr0LianOagXBVKPRDucj7FfMLG9SwJq7S",
+            .lazy = true,
+        },
+        .x11_headers = .{
+            .url = "https://github.com/allyourcodebase/x11-headers/archive/947022308236478b13fd39b638bf8a2264725751.zip",
+            .hash = "N-V-__8AAJaARwDVWtryGrmN1iiu2qeZKabbbr9H1GCKrTiN",
+            .lazy = true,
         },
         .imgui = .{
             .url = "https://github.com/ocornut/imgui/archive/refs/tags/v1.92.9b.tar.gz",

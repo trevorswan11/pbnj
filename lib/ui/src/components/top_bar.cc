@@ -79,20 +79,28 @@ auto top_bar::render(context& ctx) -> void {
     ImGui::SameLine();
     forward_.render(ctx);
 
+    const auto left_controls_w = ImGui::GetCursorPosX();
+
     // Center group alignment
-    constexpr auto search_bar_w   = 360.0f;
-    const auto     home_button_w  = padded_icon_button_dim_;
-    const auto     center_group_w = home_button_w + item_spacing + search_bar_w;
-    const auto     center_x       = (window_w - center_group_w) * 0.5f;
-    if (center_x > ImGui::GetCursorPosX() + item_spacing) {
+    constexpr auto max_search_bar_w = 360.0f;
+    const auto     home_button_w    = padded_icon_button_dim_;
+    const auto     center_group_w   = home_button_w + item_spacing + max_search_bar_w;
+    const auto     center_x         = (window_w - center_group_w) * 0.5f;
+
+    if (center_x > left_controls_w + item_spacing) {
         ImGui::SameLine(center_x);
     } else {
-        ImGui::SameLine();
+        ImGui::SameLine(left_controls_w + item_spacing);
     }
 
     // Home button
     home_.render(ctx);
     ImGui::SameLine();
+
+    const auto right_padding   = ImGui::GetStyle().WindowPadding.x;
+    const auto remaining_w     = window_w - ImGui::GetCursorPosX() - right_padding;
+    const auto actual_search_w = std::clamp(remaining_w, 80.0f, max_search_bar_w);
+    search_.set_width(actual_search_w);
     search_.render(ctx);
 }
 

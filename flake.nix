@@ -38,7 +38,11 @@
           buildInputs = [
             zig
             zls
+            vulkan-loader
           ]
+          ++ (lib.optionals stdenv.hostPlatform.isDarwin [
+            moltenvk
+          ])
           ++ (with llvmPackages_21; [
             clang-tools
             lldb
@@ -49,8 +53,13 @@
             export NIX_CFLAGS_COMPILE=$(echo $NIX_CFLAGS_COMPILE | sed 's/-fmacro-prefix-map=[^ ]*//g')
             export NIX_LDFLAGS=$(echo $NIX_LDFLAGS | sed 's/-fmacro-prefix-map=[^ ]*//g')
 
-            # Required for LLDB on macOS (stinky)
-            ${lib.optionalString stdenv.isDarwin ''
+            # MacOS schenanigans
+            ${lib.optionalString stdenv.hostPlatform.isDarwin ''
+              # Vulkan & MoltenVK configuration for macOS
+              export VK_ICD_FILENAMES="${moltenvk}/share/vulkan/icd.d/MoltenVK_icd.json"
+              export VK_DRIVER_FILES="${moltenvk}/share/vulkan/icd.d/MoltenVK_icd.json"
+              export DYLD_FALLBACK_LIBRARY_PATH="${vulkan-loader}/lib:${moltenvk}/lib:$DYLD_FALLBACK_LIBRARY_PATH"
+
               # Tested both paths on my machine and they both work (adds some flexibility)
               if [[ -z "$LLDB_DEBUGSERVER_PATH" ]]; then
                 XCODE_PATH="/Applications/Xcode.app/Contents/SharedFrameworks/LLDB.framework/Versions/A/Resources/debugserver"
